@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Specification-Title: AuthCmd
+Specification-Vendor: Huziyang520
+Specification-Version: 1.2.0
+Implementation-Title: forge
+Implementation-Version: 1.2.0
+Implementation-Vendor: Huziyang520
+Built-On-Minecraft: 1.20.1
+MixinConfigs: authcmd.mixins.json
+

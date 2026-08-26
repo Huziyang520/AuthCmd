@@ -1,0 +1,33 @@
+modLoader = "javafml" #mandatory
+loaderVersion = "[47,)" #mandatory This is typically bumped every Minecraft version by Forge. See https://files.minecraftforge.net/ for a list of versions.
+license = "MIT" # Review your options at https://choosealicense.com/.
+issueTrackerURL="https://github.com/Huziyang520/AuthCmd/issues" #optional
+[[mods]] #mandatory
+modId = "authcmd" #mandatory
+version = "1.2.0" #mandatory
+displayName = "AuthCmd" #mandatory
+#updateJSONURL="https://change.me.example.invalid/updates.json" #optional (see https://mcforge.readthedocs.io/en/latest/gettingstarted/autoupdate/)
+#displayURL="https://change.me.to.your.mods.homepage.example.invalid/" #optional (displayed in the mod UI)
+logoFile = "assets/authcmd/textures/authcmd.png" #optional (needs to be in the root of your mod jar (root of your 'resources' folder))
+authors = "Huziyang520" #optional
+description = '''Restrict which commands players can execute and which game modes they can switch to, based on a configurable permission list. 
+The AvalonBase support library is optional and only required for the visual editing GUI on the pause screen. 
+Feedback: https://github.com/Huziyang520/AuthCmd/issues or https://issue.mengcai.online/''' #mandatory (Supports multiline text)
+[[dependencies.authcmd]] #optional
+modId = "forge" #mandatory
+mandatory = true #mandatory
+versionRange = "[47,)" #mandatory
+ordering = "NONE" # The order that this dependency should load in relation to your mod, required to be either 'BEFORE' or 'AFTER' if the dependency is not mandatory
+side = "BOTH" # Side this dependency is applied on - 'BOTH', 'CLIENT' or 'SERVER'
+[[dependencies.authcmd]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.20.1, 1.22)"
+ordering = "NONE"
+side = "BOTH"
+[[dependencies.authcmd]]
+modId = "avalonbase"
+mandatory = false
+versionRange = "[1.0.0,)"
+ordering = "BEFORE"
+side = "BOTH"
