@@ -1,0 +1,107 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.11/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :buildSrc:extractPluginRequests UP-TO-DATE
+> Task :buildSrc:generatePluginAdapters UP-TO-DATE
+> Task :buildSrc:compileJava UP-TO-DATE
+> Task :buildSrc:compileGroovy NO-SOURCE
+> Task :buildSrc:compileGroovyPlugins UP-TO-DATE
+> Task :buildSrc:pluginDescriptors UP-TO-DATE
+> Task :buildSrc:processResources UP-TO-DATE
+> Task :buildSrc:classes UP-TO-DATE
+> Task :buildSrc:jar UP-TO-DATE
+
+> Configure project :common
+Fabric Loom: 1.9.2
+[AuthCmd] AvalonBase jar (fabric): D:\�����\Mymods\Only TP Re\AvalonBase\1.19.2\fabric\build\devlibs\avalonbase-fabric-1.19.2-1.1.2-dev.jar
+
+> Configure project :fabric
+Fabric Loom: 1.9.2
+[AuthCmd] AvalonBase jar (fabric): D:\�����\Mymods\Only TP Re\AvalonBase\1.19.2\fabric\build\devlibs\avalonbase-fabric-1.19.2-1.1.2-dev.jar
+
+> Configure project :forge
+MixinGradle is skipping eclipse integration, extension not found
+[AuthCmd] AvalonBase jar (forge): D:\�����\Mymods\Only TP Re\AvalonBase\1.19.2\forge\build\libs\avalonbase-forge-1.19.2-1.1.2.jar
+files(...) dependencies are not deobfuscated. Use a flatDir repository instead: https://docs.gradle.org/current/userguide/declaring_repositories.html#sub:flat_dir_resolver
+Cannot deobfuscate dependency of type DefaultFileCollectionDependency_Decorated, using obfuscated version!
+
+> Task :common:compileJava UP-TO-DATE
+> Task :forge:downloadMcpConfig
+> Task :forge:extractSrg UP-TO-DATE
+> Task :forge:createMcpToSrg UP-TO-DATE
+> Task :forge:compileJava UP-TO-DATE
+> Task :forge:addMixinsToJar
+> Task :forge:processResources UP-TO-DATE
+> Task :forge:classes UP-TO-DATE
+> Task :forge:jar
+> Task :forge:addMixinsToJavadocJar
+> Task :forge:javadoc UP-TO-DATE
+> Task :forge:javadocJar UP-TO-DATE
+> Task :forge:configureReobfTaskForReobfJar
+> Task :forge:reobfJar
+> Task :forge:configureReobfTaskForReobfJarJar
+> Task :forge:addMixinsToJarJar
+> Task :forge:jarJar SKIPPED
+> Task :forge:reobfJarJar SKIPPED
+> Task :forge:addMixinsToSourcesJar
+> Task :forge:sourcesJar UP-TO-DATE
+> Task :forge:assemble
+> Task :forge:compileTestJava NO-SOURCE
+> Task :forge:processTestResources NO-SOURCE
+> Task :forge:testClasses UP-TO-DATE
+> Task :forge:test NO-SOURCE
+> Task :forge:check UP-TO-DATE
+> Task :forge:build
+
+D:\�����\Mymods\Only TP Re\AuthCmd\1.19.2\fabric\src\main\java\com\authcmd\mod\mixin\GameModeSwitcherScreenMixin.java:24: ����: Cannot find target method "switchToHoveredGameMode(Lnet/minecraft/client/Minecraft;Lnet/minecraft/client/gui/screens/debug/GameModeSwitcherScreen$GameModeIcon;)V" for @Redirect.method="switchToHoveredGameMode(Lnet/minecraft/client/Minecraft;Lnet/minecraft/client/gui/screens/debug/GameModeSwitcherScreen$GameModeIcon;)V" in net.minecraft.client.gui.screens.debug.GameModeSwitcherScreen
+    @Redirect(method = "switchToHoveredGameMode(Lnet/minecraft/client/Minecraft;Lnet/minecraft/client/gui/screens/debug/GameModeSwitcherScreen$GameModeIcon;)V",
+    ^
+> Task :fabric:compileJava
+D:\�����\Mymods\Only TP Re\AuthCmd\1.19.2\fabric\src\main\java\com\authcmd\mod\mixin\ScreenAccessor.java:3: ����: �Ҳ�������
+import net.minecraft.client.gui.components.Renderable;
+                                          ^
+  ����:   �� Renderable
+  λ��: ����� net.minecraft.client.gui.components
+D:\�����\Mymods\Only TP Re\AuthCmd\1.19.2\fabric\src\main\java\com\authcmd\mod\mixin\ScreenAccessor.java:18: ����: �Ҳ�������
+    <T extends GuiEventListener & Renderable & NarratableEntry> T authcmd$invokeAddRenderableWidget(T widget);
+                                  ^
+  ����:   �� Renderable
+  λ��: �ӿ� ScreenAccessor
+2 ������
+1 ������
+
+> Task :fabric:compileJava FAILED
+[Incubating] Problems report is available at: file:///D:/%E6%B5%8F%E8%A7%88%E5%99%A8/Mymods/Only%20TP%20Re/AuthCmd/1.19.2/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':fabric:compileJava'.
+> Compilation failed; see the compiler output below.
+  D:\�����\Mymods\Only TP Re\AuthCmd\1.19.2\fabric\src\main\java\com\authcmd\mod\mixin\GameModeSwitcherScreenMixin.java:24: ����: Cannot find target method "switchToHoveredGameMode(Lnet/minecraft/client/Minecraft;Lnet/minecraft/client/gui/screens/debug/GameModeSwitcherScreen$GameModeIcon;)V" for @Redirect.method="switchToHoveredGameMode(Lnet/minecraft/client/Minecraft;Lnet/minecraft/client/gui/screens/debug/GameModeSwitcherScreen$GameModeIcon;)V" in net.minecraft.client.gui.screens.debug.GameModeSwitcherScreen
+      @Redirect(method = "switchToHoveredGameMode(Lnet/minecraft/client/Minecraft;Lnet/minecraft/client/gui/screens/debug/GameModeSwitcherScreen$GameModeIcon;)V",
+      ^
+  D:\�����\Mymods\Only TP Re\AuthCmd\1.19.2\fabric\src\main\java\com\authcmd\mod\mixin\ScreenAccessor.java:3: ����: �Ҳ�������
+  import net.minecraft.client.gui.components.Renderable;
+                                            ^
+    ����:   �� Renderable
+    λ��: ����� net.minecraft.client.gui.components
+  D:\�����\Mymods\Only TP Re\AuthCmd\1.19.2\fabric\src\main\java\com\authcmd\mod\mixin\ScreenAccessor.java:18: ����: �Ҳ�������
+      <T extends GuiEventListener & Renderable & NarratableEntry> T authcmd$invokeAddRenderableWidget(T widget);
+                                    ^
+    ����:   �� Renderable
+    λ��: �ӿ� ScreenAccessor
+  2 ������
+  1 ������
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+> Run with --scan to get full insights.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.11/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 1m 36s
+25 actionable tasks: 10 executed, 15 up-to-date

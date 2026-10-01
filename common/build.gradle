@@ -1,0 +1,39 @@
+plugins {
+    id 'multiloader-common'
+    id 'fabric-loom'
+}
+
+apply from: "${rootDir}/gradle/avalon-base.gradle"
+
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    mappings loom.layered {
+        officialMojangMappings()
+    }
+    compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
+    implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
+    // nightconfig（TOML）：Common 仅编译期需要，运行时由 Forge（自带）与 Fabric（显式引入）提供
+    compileOnly group: 'com.electronwill.night-config', name: 'core', version: '3.6.4'
+    compileOnly group: 'com.electronwill.night-config', name: 'toml', version: '3.6.4'
+
+    // AvalonBase 前置支持库（网络 / GUI 主题 / 配置框架）：仅编译期需要，
+    // 运行时由用户自行安装（未安装时 AvalonLink.isAvalonLoaded() 返回 false，相关代码路径跳过）。
+    // jar 定位逻辑见 gradle/avalon-base.gradle。
+    modCompileOnly(files(resolveAvalonJar('fabric')))
+}
+
+configurations {
+    commonJava {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+    commonResources {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+}
+
+artifacts {
+    commonJava sourceSets.main.java.sourceDirectories.singleFile
+    commonResources sourceSets.main.resources.sourceDirectories.singleFile
+}

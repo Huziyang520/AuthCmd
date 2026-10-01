@@ -1,0 +1,61 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.11/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :buildSrc:extractPluginRequests UP-TO-DATE
+> Task :buildSrc:generatePluginAdapters UP-TO-DATE
+> Task :buildSrc:compileJava UP-TO-DATE
+> Task :buildSrc:compileGroovy NO-SOURCE
+> Task :buildSrc:compileGroovyPlugins UP-TO-DATE
+> Task :buildSrc:pluginDescriptors UP-TO-DATE
+> Task :buildSrc:processResources UP-TO-DATE
+> Task :buildSrc:classes UP-TO-DATE
+> Task :buildSrc:jar UP-TO-DATE
+
+> Configure project :common
+Fabric Loom: 1.9.2
+[AuthCmd] AvalonBase jar (fabric): D:\�����\Mymods\Only TP Re\AvalonBase\1.19.2\fabric\build\devlibs\avalonbase-fabric-1.19.2-1.1.2-dev.jar
+
+> Configure project :fabric
+Fabric Loom: 1.9.2
+[AuthCmd] AvalonBase jar (fabric): D:\�����\Mymods\Only TP Re\AvalonBase\1.19.2\fabric\build\devlibs\avalonbase-fabric-1.19.2-1.1.2-dev.jar
+
+> Configure project :forge
+MixinGradle is skipping eclipse integration, extension not found
+[AuthCmd] AvalonBase jar (forge): D:\�����\Mymods\Only TP Re\AvalonBase\1.19.2\forge\build\libs\avalonbase-forge-1.19.2-1.1.2.jar
+files(...) dependencies are not deobfuscated. Use a flatDir repository instead: https://docs.gradle.org/current/userguide/declaring_repositories.html#sub:flat_dir_resolver
+Cannot deobfuscate dependency of type DefaultFileCollectionDependency_Decorated, using obfuscated version!
+
+> Task :common:compileJava UP-TO-DATE
+> Task :fabric:compileJava UP-TO-DATE
+> Task :fabric:processResources UP-TO-DATE
+> Task :fabric:classes UP-TO-DATE
+> Task :fabric:jar UP-TO-DATE
+> Task :fabric:javadoc UP-TO-DATE
+> Task :fabric:javadocJar UP-TO-DATE
+> Task :fabric:compileTestJava NO-SOURCE
+> Task :fabric:processIncludeJars UP-TO-DATE
+> Task :fabric:remapJar UP-TO-DATE
+> Task :fabric:sourcesJar UP-TO-DATE
+> Task :fabric:remapSourcesJar UP-TO-DATE
+> Task :fabric:assemble UP-TO-DATE
+> Task :common:processResources UP-TO-DATE
+> Task :common:classes UP-TO-DATE
+> Task :common:compileTestJava NO-SOURCE
+> Task :common:jar UP-TO-DATE
+> Task :common:processIncludeJars UP-TO-DATE
+> Task :common:remapJar UP-TO-DATE
+> Task :fabric:processTestResources NO-SOURCE
+> Task :fabric:testClasses UP-TO-DATE
+> Task :fabric:test NO-SOURCE
+> Task :fabric:validateAccessWidener NO-SOURCE
+> Task :fabric:check UP-TO-DATE
+> Task :fabric:build UP-TO-DATE
+[Incubating] Problems report is available at: file:///D:/%E6%B5%8F%E8%A7%88%E5%99%A8/Mymods/Only%20TP%20Re/AuthCmd/1.19.2/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.11/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 54s
+21 actionable tasks: 21 up-to-date
