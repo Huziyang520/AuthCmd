@@ -1,0 +1,71 @@
+plugins {
+    id 'multiloader-loader'
+    id 'net.minecraftforge.gradle'
+    id 'org.spongepowered.mixin' version '0.7.+'
+}
+
+apply from: "${rootDir}/gradle/avalon-base.gradle"
+
+mixin {
+    // 为 main 源码集生成 refmap（official 命名 → SRG），并注入运行配置与 Jar Manifest 的 MixinConfigs 键
+    add sourceSets.main, 'authcmd.refmap.json'
+    config 'authcmd.mixins.json'
+}
+
+minecraft {
+    mappings channel: 'official', version: minecraft_version
+    copyIdeResources = true //Calls processResources when in dev
+    reobf = false // Forge 1.20.6+ uses official mappings at runtime, so we shouldn't reobf from official to SRG
+
+    runs {
+        client {
+            workingDirectory project.file('run')
+            ideaModule "${rootProject.name}.${project.name}.main"
+            taskName 'Client'
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            mods {
+                "${mod_id}" {
+                    source sourceSets.main
+                }
+            }
+        }
+        server {
+            workingDirectory project.file('run')
+            ideaModule "${rootProject.name}.${project.name}.main"
+            taskName 'Server'
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            args '--nogui'
+            mods {
+                "${mod_id}" {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
+    // AvalonBase 前置支持库：本项目的 source set 包含 common 的源码目录（由 multiloader-loader
+    // 注入），因此这里也必须提供 com.avalon.* 才能编译 gui / NetworkRegistration。
+    //
+    // Forge 1.20.6+ 运行时用官方命名，AvalonBase 的 dev jar 已是 named 映射，无需再 deobf。
+    // 用 compileOnly 而非 implementation：AvalonBase 是可选前置，不应进入运行时依赖；
+    // 未安装时由 AvalonLink.isAvalonLoaded() 兜底。
+    // jar 定位逻辑见 gradle/avalon-base.gradle。
+    compileOnly(files(resolveAvalonJar('forge')))
+
+    // nightconfig（TOML）：Forge 运行时自带，编译期显式声明以解析 common 的引用
+    compileOnly group: 'com.electronwill.night-config', name: 'core', version: '3.6.4'
+    compileOnly group: 'com.electronwill.night-config', name: 'toml', version: '3.6.4'
+    compileOnly project(":common")
+    annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    sourceCompatibility = targetCompatibility = "${java_version}"
+}

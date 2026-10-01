@@ -1,0 +1,56 @@
+plugins {
+    id 'multiloader-loader'
+    id 'fabric-loom'
+}
+
+apply from: "${rootDir}/gradle/avalon-base.gradle"
+
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    mappings loom.layered {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-${parchment_minecraft}:${parchment_version}@zip")
+    }
+    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+
+    // AvalonBase 前置支持库：本项目的 source set 包含 common 的源码目录（由 multiloader-loader
+    // 注入），因此这里也必须提供 com.avalon.* 才能编译 gui / NetworkRegistration。
+    //
+    // 用 modCompileOnly 而非 modImplementation：AvalonBase 是可选前置，
+    // 不应进入本模组的运行时依赖元数据；未安装时由 AvalonLink.isAvalonLoaded() 兜底。
+    // modLocalRuntime 让 dev 环境仍能加载它，方便直接测 GUI，且不影响发布产物。
+    // jar 定位逻辑见 gradle/avalon-base.gradle。
+    def avalonJar = files(resolveAvalonJar('fabric'))
+    modCompileOnly(avalonJar)
+    modLocalRuntime(avalonJar)
+
+    implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
+    // nightconfig（TOML）：Fabric 不自带，需打包进模组（common 与 AvalonBase 均依赖）
+    include implementation("com.electronwill.night-config:core:3.6.4")
+    include implementation("com.electronwill.night-config:toml:3.6.4")
+    implementation project(":common")
+}
+
+loom {
+    if (project(":common").file("src/main/resources/${mod_id}.accesswidener").exists()) {
+        accessWidenerPath.set(project(":common").file("src/main/resources/${mod_id}.accesswidener"))
+    }
+    mixin {
+        defaultRefmapName.set("${mod_id}.refmap.json")
+    }
+    runs {
+        client {
+            client()
+            setConfigName("Fabric Client")
+            ideConfigGenerated(true)
+            runDir("run")
+        }
+        server {
+            server()
+            setConfigName("Fabric Server")
+            ideConfigGenerated(true)
+            runDir("run")
+        }
+    }
+}

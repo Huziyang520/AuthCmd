@@ -1,0 +1,43 @@
+plugins {
+    id 'multiloader-loader'
+    id 'net.neoforged.moddev'
+}
+
+apply from: "${rootDir}/gradle/avalon-base.gradle"
+
+base {
+    archivesName = "${mod_name}-neoforge-${minecraft_version}"
+}
+
+neoForge {
+    version = neoforge_version
+
+    // Automated decoration of Dependencies for Dev/Prod builds, and ModMaven publishing
+    addModdingDependenciesTo(sourceSets.main)
+
+    parchment {
+        minecraftVersion = parchment_minecraft
+        mappingsVersion = parchment_version
+    }
+
+    runs {
+        client {
+            client()
+            programArguments.addAll '--username', 'Dev'
+        }
+        server {
+            server()
+        }
+    }
+}
+
+dependencies {
+    // AvalonBase 前置支持库：仅编译期需要（运行时由 neoforge.mods.toml 声明可选前置）。
+    // 编译期来源与 forge 子项目一致（common 源码经由 multiloader-loader 注入，需各自声明引用）。
+    compileOnly(files(resolveAvalonJar('neoforge')))
+    compileOnly project(":common")
+
+    // nightconfig（TOML）：NeoForge 运行时自带，编译期显式声明以解析 common 的引用
+    compileOnly group: 'com.electronwill.night-config', name: 'core', version: '3.6.4'
+    compileOnly group: 'com.electronwill.night-config', name: 'toml', version: '3.6.4'
+}
