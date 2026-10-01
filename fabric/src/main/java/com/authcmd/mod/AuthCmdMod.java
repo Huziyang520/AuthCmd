@@ -4,6 +4,9 @@ import com.authcmd.mod.config.AuthCmdConfig;
 import com.authcmd.mod.event.ClientTreeResender;
 import com.authcmd.mod.event.CommandTreeLogic;
 import com.authcmd.mod.event.PlayerJoinLogic;
+import com.authcmd.mod.network.AvalonNetworkBridge;
+import com.authcmd.mod.network.AuthCmdSyncPacket;
+import com.authcmd.mod.network.NetworkChannels;
 import com.mojang.logging.LogUtils;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -31,6 +34,12 @@ public class AuthCmdMod implements ModInitializer {
             // 注入命令树重发回调：手改 TOML 热加载生效时，让已在线玩家的补全树反映最新白名单
             AuthCmdConfig.setCommandTreeResender(() ->
                     server.getPlayerList().getPlayers().forEach(ClientTreeResender::resend));
+            // 注入配置重播回调：手改 TOML 热加载生效时，重播 SYNC 包让 show_pause_button 等开关也即时生效
+            AuthCmdConfig.setConfigBroadcaster(() ->
+                    AvalonNetworkBridge.sendToAll(server, NetworkChannels.SYNC,
+                            new AuthCmdSyncPacket(AuthCmdConfig.mode, AuthCmdConfig.showPauseButton,
+                                    AuthCmdConfig.nonOpWhitelist, AuthCmdConfig.opBlacklist,
+                                    AuthCmdConfig.nonOpExempt, AuthCmdConfig.opExempt)));
             LOGGER.info("AuthCmd config initialized");
         });
 

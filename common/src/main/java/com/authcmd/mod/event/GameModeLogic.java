@@ -78,18 +78,40 @@ public class GameModeLogic {
     }
 
     /**
+     * 客户端 F3+F4 切换器入口/发包的放行判定（宽松）。
+     *
+     * <p>只判定「功能一（非OP白名单）是否生效」与「本地玩家是否非OP」，<b>不在客户端做名单二次判定</b>：
+     * 客户端名单可能滞后——未装 AvalonBase 时客户端不注册网络接收器（{@code CommonClass.init} 直接返回），
+     * 收不到服务端下发的配置同步；联机首帧也存在时间窗。若在客户端按本地名单拦截，就会出现
+     * 「名单内命令可用（服务端提权执行）、但 F3+F4 切换器打不开（客户端被本地空名单挡下）」的不一致。
+     *
+     * <p>真正是否允许切换由服务端 {@link #shouldBlock} 依据名单统一把关：白名单命中 → 放行；
+     * 未命中 → 拦截 + 红字提示。服务端未生效（{@code mode=disabled} 等）时，服务端
+     * {@link #shouldAllowGameModeChange} 仍会把包交还原版权限检查，非OP 无法切换。
+     *
+     * @param player 客户端本地玩家（{@code LocalPlayer}，以 {@link Player} 形参传入以避免 common 侧引用客户端类）
+     * @return true 表示应绕过原版权限检查，放行切换器打开/切换
+     */
+    public static boolean shouldAllowGameModeSwitcher(Player player) {
+        if (player == null) return false;
+        if (player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)) return false; // OP 走原版逻辑即可
+        // 尚未收到服务端配置：本地无从判定，放行入口交服务端把关（服务端未生效时按原版拒绝，无越权风险）
+        if (!AuthCmdConfig.isClientConfigSynced()) return true;
+        return AuthCmdConfig.resolveDomain(false) == 1; // 仅功能一（非OP白名单）生效时放行
+    }
+
+    /**
      * 客户端 F3+F4 切换器两处 {@code LocalPlayer.hasPermissions(int)} 的通用放行判定。
      *
-     * <p>{@link KeyboardHandlerMixin}（打开界面）与 {@code GameModeSwitcherScreenMixin}
-     * （发送切换命令）共用此逻辑，避免复制。非OP在功能一启用且 {@code gamemode} 命中白名单
-     * （或豁免）时返回 true；OP 及其他情形交还原版 {@code player.hasPermissions(permissionLevel)}。
+     * <p>1.20.1 等旧版本的切换器走 {@code hasPermissions(int)}；26.3 已改为直接判定
+     * {@code PermissionCheck}，由 {@link #shouldAllowGameModeSwitcher} 承担。
      *
      * @param player          客户端本地玩家
      * @param permissionLevel 原版权限检查要求的权限等级
      * @return true 表示放行（绕过原版权限判定）
      */
     public static boolean allowHasPermissions(Player player, int permissionLevel) {
-        if (shouldAllowGameModeChange(player)) return true;
+        if (shouldAllowGameModeSwitcher(player)) return true;
         return player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER);
     }
 }

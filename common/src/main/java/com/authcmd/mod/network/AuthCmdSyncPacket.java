@@ -24,5 +24,7 @@ public class AuthCmdSyncPacket extends AuthCmdConfigPacket {
     /** 客户端收到后应用配置。 */
     public void applyToClient() {
         applyToConfig();
+        // 标记客户端已拿到服务端配置：客户端侧入口判定（F3+F4 切换器）此后按真实配置判定
+        com.authcmd.mod.config.AuthCmdConfig.markClientConfigSynced();
     }
 }

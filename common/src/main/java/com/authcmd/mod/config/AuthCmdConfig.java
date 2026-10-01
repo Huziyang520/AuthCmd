@@ -82,6 +82,20 @@ public class AuthCmdConfig {
     /** 热加载确认配置文件变更后，由平台入口注入的回调：向在线玩家重发命令树（config 层无服务端引用，用回调解耦）。 */
     private static volatile Runnable commandTreeResender;
 
+    /** 热加载确认配置文件变更后，由平台入口注入的回调：向在线玩家重播配置同步包。 */
+    private static volatile Runnable configBroadcaster;
+
+    /**
+     * 客户端是否已收到过服务端下发的配置同步。
+     *
+     * <p>用于区分"客户端已知配置 = 功能未生效"与"客户端根本还没拿到配置"两种情况：
+     * 未装 AvalonBase 时客户端不会注册网络接收器（{@code CommonClass.init} 直接返回），
+     * 也收不到配置同步；联机首帧同样存在时间窗。此时客户端不应按本地默认值（disabled / 空名单）
+     * 做否定判定，否则会出现"名单内命令可用、但 F3+F4 切换器打不开"的不一致。
+     * 该判定只由客户端侧调用方使用，服务端侧语义无影响。
+     */
+    private static volatile boolean clientConfigSynced = false;
+
     private AuthCmdConfig() {
     }
 
@@ -190,6 +204,10 @@ public class AuthCmdConfig {
             if (commandTreeResender != null) {
                 commandTreeResender.run();
             }
+            // 手改 TOML 时命令树重发只覆盖补全；show_pause_button 等非命令类字段需要重播配置包才对已在线客户端生效
+            if (configBroadcaster != null) {
+                configBroadcaster.run();
+            }
         } catch (Exception e) {
             LOGGER.error("Failed to hot-reload config", e);
         }
@@ -202,6 +220,24 @@ public class AuthCmdConfig {
      */
     public static void setCommandTreeResender(Runnable resender) {
         commandTreeResender = resender;
+    }
+
+    /**
+     * 注入配置重播回调。仅服务端入口在服务器启动后调用一次；
+     * 手改 TOML 触发热加载时向在线玩家重播 SYNC 包，使 {@code show_pause_button} 等非命令类开关也即时生效。
+     */
+    public static void setConfigBroadcaster(Runnable broadcaster) {
+        configBroadcaster = broadcaster;
+    }
+
+    /** 客户端收到服务端配置同步后置位（仅客户端侧语义）。 */
+    public static void markClientConfigSynced() {
+        clientConfigSynced = true;
+    }
+
+    /** 客户端是否已收到过服务端配置同步。 */
+    public static boolean isClientConfigSynced() {
+        return clientConfigSynced;
     }
 
     private static List<String> getSubList(Config cfg, String section) {
