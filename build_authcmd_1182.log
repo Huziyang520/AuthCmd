@@ -1,0 +1,173 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.11/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :buildSrc:extractPluginRequests UP-TO-DATE
+> Task :buildSrc:generatePluginAdapters UP-TO-DATE
+> Task :buildSrc:compileJava UP-TO-DATE
+> Task :buildSrc:compileGroovy NO-SOURCE
+> Task :buildSrc:compileGroovyPlugins UP-TO-DATE
+> Task :buildSrc:pluginDescriptors UP-TO-DATE
+> Task :buildSrc:processResources UP-TO-DATE
+> Task :buildSrc:classes UP-TO-DATE
+> Task :buildSrc:jar UP-TO-DATE
+
+> Configure project :common
+Fabric Loom: 1.9.2
+[AuthCmd] AvalonBase jar (fabric): D:\�����\Mymods\Only TP Re\AvalonBase\1.18.2\fabric\build\devlibs\avalonbase-fabric-1.18.2-1.1.2-dev.jar
+
+> Configure project :fabric
+Fabric Loom: 1.9.2
+[AuthCmd] AvalonBase jar (fabric): D:\�����\Mymods\Only TP Re\AvalonBase\1.18.2\fabric\build\devlibs\avalonbase-fabric-1.18.2-1.1.2-dev.jar
+
+> Configure project :forge
+MixinGradle is skipping eclipse integration, extension not found
+[AuthCmd] AvalonBase jar (forge): D:\�����\Mymods\Only TP Re\AvalonBase\1.18.2\forge\build\libs\avalonbase-forge-1.18.2-1.1.2.jar
+files(...) dependencies are not deobfuscated. Use a flatDir repository instead: https://docs.gradle.org/current/userguide/declaring_repositories.html#sub:flat_dir_resolver
+Cannot deobfuscate dependency of type DefaultFileCollectionDependency_Decorated, using obfuscated version!
+
+> Task :common:compileJava
+����: δ֪��ö�ٳ��� EnvType.CLIENT
+  ԭ��: �Ҳ���net.fabricmc.api.EnvType�����ļ�
+����: δ֪��ö�ٳ��� EnvType.CLIENT
+����: δ֪��ö�ٳ��� EnvType.CLIENT
+����: δ֪��ö�ٳ��� EnvType.CLIENT
+����: δ֪��ö�ٳ��� EnvType.CLIENT
+����: δ֪��ö�ٳ��� EnvType.CLIENT
+����: δ֪��ö�ٳ��� EnvType.CLIENT
+����: δ֪��ö�ٳ��� EnvType.CLIENT
+����: δ֪��ö�ٳ��� EnvType.CLIENT
+����: δ֪��ö�ٳ��� EnvType.CLIENT
+����: δ֪��ö�ٳ��� EnvType.CLIENT
+����: δ֪��ö�ٳ��� EnvType.CLIENT
+����: δ֪��ö�ٳ��� EnvType.CLIENT
+����: δ֪��ö�ٳ��� EnvType.CLIENT
+D:\�����\Mymods\Only TP Re\AuthCmd\1.18.2\common\src\main\java\com\authcmd\mod\gui\AuthCmdAddDialog.java:8: ����: �Ҳ�������
+import net.minecraft.client.gui.GuiGraphics;
+                               ^
+  ����:   �� GuiGraphics
+  λ��: ����� net.minecraft.client.gui
+D:\�����\Mymods\Only TP Re\AuthCmd\1.18.2\common\src\main\java\com\authcmd\mod\gui\AuthCmdAddDialog.java:140: ����: �Ҳ�������
+    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+                       ^
+  ����:   �� GuiGraphics
+  λ��: �� AuthCmdAddDialog
+D:\�����\Mymods\Only TP Re\AuthCmd\1.18.2\common\src\main\java\com\authcmd\mod\gui\AuthCmdScreen.java:12: ����: �Ҳ�������
+import net.minecraft.client.gui.GuiGraphics;
+                               ^
+  ����:   �� GuiGraphics
+  λ��: ����� net.minecraft.client.gui
+D:\�����\Mymods\Only TP Re\AuthCmd\1.18.2\common\src\main\java\com\authcmd\mod\gui\AuthCmdScreen.java:123: ����: �Ҳ�������
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+                       ^
+  ����:   �� GuiGraphics
+  λ��: �� AuthCmdScreen
+D:\�����\Mymods\Only TP Re\AuthCmd\1.18.2\common\src\main\java\com\authcmd\mod\gui\AuthCmdScreen.java:189: ����: �Ҳ�������
+    private void renderList(GuiGraphics graphics, int mouseX, int mouseY, Component label,
+                            ^
+  ����:   �� GuiGraphics
+  λ��: �� AuthCmdScreen
+D:\�����\Mymods\Only TP Re\AuthCmd\1.18.2\common\src\main\java\com\authcmd\mod\gui\PauseScreenButton.java:3: ����: �Ҳ�������
+import net.minecraft.client.gui.GuiGraphics;
+                               ^
+  ����:   �� GuiGraphics
+  λ��: ����� net.minecraft.client.gui
+����: δ֪��ö�ٳ��� EnvType.CLIENT
+  ԭ��: �Ҳ���net.fabricmc.api.EnvType�����ļ�
+����: δ֪��ö�ٳ��� EnvType.CLIENT
+����: δ֪��ö�ٳ��� EnvType.CLIENT
+����: δ֪��ö�ٳ��� EnvType.CLIENT
+����: δ֪��ö�ٳ��� EnvType.CLIENT
+����: δ֪��ö�ٳ��� EnvType.CLIENT
+����: δ֪��ö�ٳ��� EnvType.CLIENT
+����: δ֪��ö�ٳ��� EnvType.CLIENT
+����: δ֪��ö�ٳ��� EnvType.CLIENT
+����: δ֪��ö�ٳ��� EnvType.CLIENT
+����: δ֪��ö�ٳ��� EnvType.CLIENT
+����: δ֪��ö�ٳ��� EnvType.CLIENT
+����: δ֪��ö�ٳ��� EnvType.CLIENT
+����: δ֪��ö�ٳ��� EnvType.CLIENT
+6 ������
+28 ������
+
+> Task :common:compileJava FAILED
+[Incubating] Problems report is available at: file:///D:/%E6%B5%8F%E8%A7%88%E5%99%A8/Mymods/Only%20TP%20Re/AuthCmd/1.18.2/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':common:compileJava'.
+> Compilation failed; see the compiler output below.
+  ����: δ֪��ö�ٳ��� EnvType.CLIENT
+  ����: δ֪��ö�ٳ��� EnvType.CLIENT
+  ����: δ֪��ö�ٳ��� EnvType.CLIENT
+  ����: δ֪��ö�ٳ��� EnvType.CLIENT
+  ����: δ֪��ö�ٳ��� EnvType.CLIENT
+  ����: δ֪��ö�ٳ��� EnvType.CLIENT
+  ����: δ֪��ö�ٳ��� EnvType.CLIENT
+  ����: δ֪��ö�ٳ��� EnvType.CLIENT
+  ����: δ֪��ö�ٳ��� EnvType.CLIENT
+  ����: δ֪��ö�ٳ��� EnvType.CLIENT
+  ����: δ֪��ö�ٳ��� EnvType.CLIENT
+  ����: δ֪��ö�ٳ��� EnvType.CLIENT
+  ����: δ֪��ö�ٳ��� EnvType.CLIENT
+  ����: δ֪��ö�ٳ��� EnvType.CLIENT
+  ����: δ֪��ö�ٳ��� EnvType.CLIENT
+  ����: δ֪��ö�ٳ��� EnvType.CLIENT
+  ����: δ֪��ö�ٳ��� EnvType.CLIENT
+  ����: δ֪��ö�ٳ��� EnvType.CLIENT
+  ����: δ֪��ö�ٳ��� EnvType.CLIENT
+  ����: δ֪��ö�ٳ��� EnvType.CLIENT
+  ����: δ֪��ö�ٳ��� EnvType.CLIENT
+  ����: δ֪��ö�ٳ��� EnvType.CLIENT
+  ����: δ֪��ö�ٳ��� EnvType.CLIENT
+  ����: δ֪��ö�ٳ��� EnvType.CLIENT
+  ����: δ֪��ö�ٳ��� EnvType.CLIENT
+  ����: δ֪��ö�ٳ��� EnvType.CLIENT
+  ����: δ֪��ö�ٳ��� EnvType.CLIENT
+    ԭ��: �Ҳ���net.fabricmc.api.EnvType�����ļ�
+  ����: δ֪��ö�ٳ��� EnvType.CLIENT
+    ԭ��: �Ҳ���net.fabricmc.api.EnvType�����ļ�
+  D:\�����\Mymods\Only TP Re\AuthCmd\1.18.2\common\src\main\java\com\authcmd\mod\gui\AuthCmdAddDialog.java:8: ����: �Ҳ�������
+  import net.minecraft.client.gui.GuiGraphics;
+                                 ^
+    ����:   �� GuiGraphics
+    λ��: ����� net.minecraft.client.gui
+  D:\�����\Mymods\Only TP Re\AuthCmd\1.18.2\common\src\main\java\com\authcmd\mod\gui\AuthCmdAddDialog.java:140: ����: �Ҳ�������
+      public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+                         ^
+    ����:   �� GuiGraphics
+    λ��: �� AuthCmdAddDialog
+  D:\�����\Mymods\Only TP Re\AuthCmd\1.18.2\common\src\main\java\com\authcmd\mod\gui\AuthCmdScreen.java:12: ����: �Ҳ�������
+  import net.minecraft.client.gui.GuiGraphics;
+                                 ^
+    ����:   �� GuiGraphics
+    λ��: ����� net.minecraft.client.gui
+  D:\�����\Mymods\Only TP Re\AuthCmd\1.18.2\common\src\main\java\com\authcmd\mod\gui\AuthCmdScreen.java:123: ����: �Ҳ�������
+      public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+                         ^
+    ����:   �� GuiGraphics
+    λ��: �� AuthCmdScreen
+  D:\�����\Mymods\Only TP Re\AuthCmd\1.18.2\common\src\main\java\com\authcmd\mod\gui\AuthCmdScreen.java:189: ����: �Ҳ�������
+      private void renderList(GuiGraphics graphics, int mouseX, int mouseY, Component label,
+                              ^
+    ����:   �� GuiGraphics
+    λ��: �� AuthCmdScreen
+  D:\�����\Mymods\Only TP Re\AuthCmd\1.18.2\common\src\main\java\com\authcmd\mod\gui\PauseScreenButton.java:3: ����: �Ҳ�������
+  import net.minecraft.client.gui.GuiGraphics;
+                                 ^
+    ����:   �� GuiGraphics
+    λ��: ����� net.minecraft.client.gui
+  6 ������
+  28 ������
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+> Run with --scan to get full insights.
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.11/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 2m 48s
+8 actionable tasks: 1 executed, 7 up-to-date
