@@ -1,0 +1,32 @@
+modLoader = "javafml"
+loaderVersion = "${neoforge_loader_version_range}"
+license = "${license}"
+issueTrackerURL = "https://github.com/Huziyang520/AuthCmd/issues"
+[[mods]]
+modId = "${mod_id}"
+version = "${version}"
+displayName = "${mod_name}"
+logoFile = "assets/authcmd/textures/authcmd.png"
+authors = "${mod_author}"
+description = '''${description}'''
+[[mixins]]
+config = "authcmd.mixins.json"
+[[dependencies.${mod_id}]]
+modId = "neoforge"
+type = "required"
+versionRange = "[26.1.2,)"
+ordering = "NONE"
+side = "BOTH"
+[[dependencies.${mod_id}]]
+modId = "minecraft"
+type = "required"
+versionRange = "${minecraft_version_range}"
+ordering = "NONE"
+side = "BOTH"
+[[dependencies.${mod_id}]]
+# AvalonBase 前置（支持库）：可选，安装后启用暂停界面可视化编辑按钮
+modId = "avalonbase"
+type = "optional"
+versionRange = "[1.0.0,)"
+ordering = "BEFORE"
+side = "BOTH"

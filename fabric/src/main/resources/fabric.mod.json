@@ -1,0 +1,42 @@
+{
+    "schemaVersion": 1,
+    "id": "authcmd",
+    "version": "${version}",
+    "name": "${mod_name}",
+    "description": "${description}",
+    "authors": [
+        "${mod_author}"
+    ],
+    "contact": {
+        "issues": "https://github.com/Huziyang520/AuthCmd/issues"
+    },
+    "license": "${license}",
+    "icon": "assets/authcmd/textures/authcmd.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "com.authcmd.mod.AuthCmdMod"
+        ],
+        "client": [
+            "com.authcmd.mod.client.AuthCmdClient"
+        ]
+    },
+    "mixins": [
+        "${mod_id}.mixins.json"
+    ],
+    "depends": {
+        "fabricloader": ">=0.14",
+        "fabric-api": "*",
+        "minecraft": ">=26.1.2",
+        "java": ">=17"
+    },
+    "suggests": {
+        "avalonbase": ">=1.0.0"
+    },
+    "custom": {
+        "modmenu": {
+            "hidden": true,
+            "badges": []
+        }
+    }
+}
