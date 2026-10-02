@@ -63,6 +63,15 @@ public class AuthCmdMod {
         LOGGER.info("AuthCmd config initialized");
     }
 
+    /**
+     * 服务端每 tick 检查配置热加载：手改 config/authcmd.toml 后无需命令 / 进服等触发即可重播给在线玩家。
+     * 内部有 1s 节流，实际每 tick 只做一次毫秒比较。
+     */
+    @SubscribeEvent
+    public void onServerTick(net.neoforged.neoforge.event.tick.ServerTickEvent.Post event) {
+        AuthCmdConfig.reloadIfChanged();
+    }
+
     @SubscribeEvent
     public void onRegisterCommands(RegisterCommandsEvent event) {
         // 命令注册阶段即 patch 命令树，放行非OP白名单指令的权限（使其可补全、可执行）
