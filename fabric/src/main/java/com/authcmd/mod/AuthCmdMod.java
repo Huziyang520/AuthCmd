@@ -38,9 +38,10 @@ public class AuthCmdMod implements ModInitializer {
             // 注入配置重播回调：手改 TOML 热加载生效时，重播 SYNC 包让 show_pause_button 等开关也即时生效
             AuthCmdConfig.setConfigBroadcaster(() ->
                     AvalonNetworkBridge.sendToAll(server, NetworkChannels.SYNC,
-                            new AuthCmdSyncPacket(AuthCmdConfig.mode, AuthCmdConfig.showPauseButton,
-                                    AuthCmdConfig.nonOpWhitelist, AuthCmdConfig.opBlacklist,
-                                    AuthCmdConfig.nonOpExempt, AuthCmdConfig.opExempt)));
+                        new AuthCmdSyncPacket(AuthCmdConfig.mode, AuthCmdConfig.allowEntitySelectors, AuthCmdConfig.showPauseButton,
+                                AuthCmdConfig.enableAnimations,
+                                AuthCmdConfig.nonOpWhitelist, AuthCmdConfig.opBlacklist,
+                                AuthCmdConfig.nonOpExempt, AuthCmdConfig.opExempt)));
             LOGGER.info("AuthCmd config initialized");
         });
 

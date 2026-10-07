@@ -1,12 +1,14 @@
 {
   "gui.authcmd.title": "AuthCmd － 敕令權柄之制",
   "gui.authcmd.mode_label": "擇法：",
-  "gui.authcmd.mode_disabled": "盡廢",
+  "gui.authcmd.mode_disabled": "廢其模",
   "gui.authcmd.mode_non_op_only": "非OP者之准籍",
   "gui.authcmd.mode_op_only": "OP者之禁籍",
-  "gui.authcmd.mode_both": "並行",
-  "gui.authcmd.toggle_label": "界面設置：",
-  "gui.authcmd.show_pause_button": "示暫止之頁之編修鈕",
+  "gui.authcmd.mode_both": "二者並行",
+  "gui.authcmd.toggle_label": "設置：",
+  "gui.authcmd.allow_entity_selectors": "許用擇取標的",
+  "gui.authcmd.show_pause_button": "示暫止之鈕",
+  "gui.authcmd.enable_animations": "啟畫動之效",
   "gui.authcmd.command_list_label": "敕令名籍",
   "gui.authcmd.exempt_list_label": "宥免名籍",
   "gui.authcmd.new_entry": "增",
@@ -26,7 +28,9 @@
   "gui.authcmd.view_only": "§c唯可覽，汝無編修之權柄",
   "gui.authcmd.can_edit": "§a汝有編修之權柄",
   "gui.authcmd.already_in_list": "已在此名籍",
-  "message.authcmd.blocked": "司牧禁此敕令！",
+  "message.authcmd.blocked": "AuthCmd：此敕令已禁。",
   "message.authcmd.blocked_gamemode": "司牧禁戲法之易！",
-  "message.authcmd.avalon_missing": "AuthCmd：裝AvalonBase乃可視化編修。此告示可於設置之卷中關之。"
+  "message.authcmd.avalon_missing": "AuthCmd：裝AvalonBase乃可視化編修。此告示可於設置之卷中關之。",
+"authcmd.feedback": "備用之奏報處",
+"message.authcmd.selector_blocked": "AuthCmd：不許擇取標的！"
 }

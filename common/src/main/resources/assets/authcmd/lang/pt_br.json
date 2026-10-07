@@ -1,12 +1,14 @@
 {
   "gui.authcmd.title": "AuthCmd - Controle de permissões de comandos",
   "gui.authcmd.mode_label": "Modo:",
-  "gui.authcmd.mode_disabled": "Desativado",
+  "gui.authcmd.mode_disabled": "Desativar o mod",
   "gui.authcmd.mode_non_op_only": "Lista branca de comandos (sem OP)",
   "gui.authcmd.mode_op_only": "Lista negra de comandos (OP)",
-  "gui.authcmd.mode_both": "Ambos",
-  "gui.authcmd.toggle_label": "Interface:",
-  "gui.authcmd.show_pause_button": "Mostrar botão de edição na tela de pausa",
+  "gui.authcmd.mode_both": "Ativar ambos",
+  "gui.authcmd.toggle_label": "Configurações:",
+  "gui.authcmd.allow_entity_selectors": "Permitir seletores de alvo",
+  "gui.authcmd.show_pause_button": "Mostrar botão de pausa",
+  "gui.authcmd.enable_animations": "Ativar animações da interface",
   "gui.authcmd.command_list_label": "Lista de comandos",
   "gui.authcmd.exempt_list_label": "Jogadores isentos",
   "gui.authcmd.new_entry": "Novo",
@@ -26,7 +28,9 @@
   "gui.authcmd.view_only": "§cSomente leitura, você não tem permissão de edição",
   "gui.authcmd.can_edit": "§aVocê tem permissão de edição",
   "gui.authcmd.already_in_list": "Já está na lista",
-  "message.authcmd.blocked": "O administrador desativou este comando!",
+  "message.authcmd.blocked": "AuthCmd: Este comando foi desativado!",
   "message.authcmd.blocked_gamemode": "O administrador desativou a troca de modo de jogo!",
-  "message.authcmd.avalon_missing": "AuthCmd: instale o AvalonBase para ativar a edição visual. Este aviso pode ser desativado no arquivo de configuração."
+  "message.authcmd.avalon_missing": "AuthCmd: instale o AvalonBase para ativar a edição visual. Este aviso pode ser desativado no arquivo de configuração.",
+"authcmd.feedback": "Endereço de feedback alternativo",
+"message.authcmd.selector_blocked": "AuthCmd: Seletores de alvo não são permitidos!"
 }

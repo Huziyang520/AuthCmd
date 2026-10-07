@@ -1,12 +1,14 @@
 {
   "gui.authcmd.title": "AuthCmd - コマンド権限管理",
   "gui.authcmd.mode_label": "モード：",
-  "gui.authcmd.mode_disabled": "すべて無効",
+  "gui.authcmd.mode_disabled": "Modを無効化",
   "gui.authcmd.mode_non_op_only": "非OP：コマンドの許可リスト",
   "gui.authcmd.mode_op_only": "OP：コマンドの禁止リスト",
-  "gui.authcmd.mode_both": "両方",
-  "gui.authcmd.toggle_label": "UI設定：",
-  "gui.authcmd.show_pause_button": "一時停止画面に編集ボタンを表示",
+  "gui.authcmd.mode_both": "両方を有効化",
+  "gui.authcmd.toggle_label": "設定：",
+  "gui.authcmd.allow_entity_selectors": "ターゲットセレクターを許可",
+  "gui.authcmd.show_pause_button": "一時停止ボタンを表示",
+  "gui.authcmd.enable_animations": "インターフェースのアニメーションを有効化",
   "gui.authcmd.command_list_label": "コマンド一覧",
   "gui.authcmd.exempt_list_label": "免除プレイヤー",
   "gui.authcmd.new_entry": "新規",
@@ -26,7 +28,9 @@
   "gui.authcmd.view_only": "§c閲覧のみ、編集権限がありません",
   "gui.authcmd.can_edit": "§a編集権限があります",
   "gui.authcmd.already_in_list": "すでにリストにあります",
-  "message.authcmd.blocked": "管理者によりこのコマンドが禁止されています！",
+  "message.authcmd.blocked": "AuthCmd: このコマンドは禁止されています！",
   "message.authcmd.blocked_gamemode": "管理者によりゲームモードの切り替えが禁止されています！",
-  "message.authcmd.avalon_missing": "AuthCmd：AvalonBaseを導入すると視覚的な編集が有効になります。この通知は設定ファイルで無効にできます。"
+  "message.authcmd.avalon_missing": "AuthCmd：AvalonBaseを導入すると視覚的な編集が有効になります。この通知は設定ファイルで無効にできます。",
+"authcmd.feedback": "予備のフィードバック先",
+"message.authcmd.selector_blocked": "AuthCmd: ターゲットセレクターは使用できません！"
 }

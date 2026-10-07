@@ -1,12 +1,14 @@
 {
   "gui.authcmd.title": "AuthCmd - 명령 권한 관리",
   "gui.authcmd.mode_label": "모드:",
-  "gui.authcmd.mode_disabled": "모두 비활성화",
+  "gui.authcmd.mode_disabled": "모드 비활성화",
   "gui.authcmd.mode_non_op_only": "비OP: 명령 허용 목록",
   "gui.authcmd.mode_op_only": "OP: 명령 차단 목록",
-  "gui.authcmd.mode_both": "둘 다",
-  "gui.authcmd.toggle_label": "UI 설정:",
-  "gui.authcmd.show_pause_button": "일시정지 화면에 편집 버튼 표시",
+  "gui.authcmd.mode_both": "둘 다 활성화",
+  "gui.authcmd.toggle_label": "설정:",
+  "gui.authcmd.allow_entity_selectors": "대상 선택기 허용",
+  "gui.authcmd.show_pause_button": "일시정지 버튼 표시",
+  "gui.authcmd.enable_animations": "인터페이스 애니메이션 사용",
   "gui.authcmd.command_list_label": "명령 목록",
   "gui.authcmd.exempt_list_label": "면제 플레이어",
   "gui.authcmd.new_entry": "새로 추가",
@@ -26,7 +28,9 @@
   "gui.authcmd.view_only": "§c보기 전용, 편집 권한이 없습니다",
   "gui.authcmd.can_edit": "§a편집 권한이 있습니다",
   "gui.authcmd.already_in_list": "이미 목록에 있습니다",
-  "message.authcmd.blocked": "관리자가 이 명령을 금지했습니다!",
+  "message.authcmd.blocked": "AuthCmd: 이 명령은 금지되었습니다!",
   "message.authcmd.blocked_gamemode": "관리자가 게임 모드 전환을 금지했습니다!",
-  "message.authcmd.avalon_missing": "AuthCmd: AvalonBase를 설치하면 시각적 편집을 사용할 수 있습니다. 이 알림은 설정 파일에서 끌 수 있습니다."
+  "message.authcmd.avalon_missing": "AuthCmd: AvalonBase를 설치하면 시각적 편집을 사용할 수 있습니다. 이 알림은 설정 파일에서 끌 수 있습니다.",
+"authcmd.feedback": "대체 피드백 주소",
+"message.authcmd.selector_blocked": "AuthCmd: 대상 선택기는 허용되지 않습니다!"
 }

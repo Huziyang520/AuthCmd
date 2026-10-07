@@ -1,12 +1,14 @@
 {
   "gui.authcmd.title": "AuthCmd — контроль прав на команды",
   "gui.authcmd.mode_label": "Режим:",
-  "gui.authcmd.mode_disabled": "Отключено",
+  "gui.authcmd.mode_disabled": "Отключить мод",
   "gui.authcmd.mode_non_op_only": "Белый список команд (без OP)",
   "gui.authcmd.mode_op_only": "Чёрный список команд (OP)",
-  "gui.authcmd.mode_both": "Оба",
-  "gui.authcmd.toggle_label": "Интерфейс:",
-  "gui.authcmd.show_pause_button": "Показывать кнопку редактирования на экране паузы",
+  "gui.authcmd.mode_both": "Включить оба",
+  "gui.authcmd.toggle_label": "Настройки:",
+  "gui.authcmd.allow_entity_selectors": "Разрешить селекторы цели",
+  "gui.authcmd.show_pause_button": "Показывать кнопку паузы",
+  "gui.authcmd.enable_animations": "Включить анимацию интерфейса",
   "gui.authcmd.command_list_label": "Список команд",
   "gui.authcmd.exempt_list_label": "Исключённые игроки",
   "gui.authcmd.new_entry": "Добавить",
@@ -26,7 +28,9 @@
   "gui.authcmd.view_only": "§cТолько просмотр, у вас нет прав на редактирование",
   "gui.authcmd.can_edit": "§aУ вас есть права на редактирование",
   "gui.authcmd.already_in_list": "Уже в списке",
-  "message.authcmd.blocked": "Администратор отключил эту команду!",
+  "message.authcmd.blocked": "AuthCmd: Эта команда отключена!",
   "message.authcmd.blocked_gamemode": "Администратор отключил переключение игрового режима!",
-  "message.authcmd.avalon_missing": "AuthCmd: установите AvalonBase для визуального редактирования. Это уведомление можно отключить в файле конфигурации."
+  "message.authcmd.avalon_missing": "AuthCmd: установите AvalonBase для визуального редактирования. Это уведомление можно отключить в файле конфигурации.",
+"authcmd.feedback": "Резервный адрес обратной связи",
+"message.authcmd.selector_blocked": "AuthCmd: Селекторы цели запрещены!"
 }

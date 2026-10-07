@@ -4,6 +4,8 @@ import com.authcmd.mod.AvalonLink;
 import com.authcmd.mod.config.AuthCmdConfig;
 import com.authcmd.mod.network.AuthCmdUpdatePacket;
 import com.authcmd.mod.network.NetworkChannels;
+import com.avalon.base.gui.anim.ScreenAnimType;
+import com.avalon.base.gui.anim.ScrollAnim;
 import com.avalon.base.gui.panel.PanelHover;
 import com.avalon.base.gui.screen.AvalonConfigScreen;
 import com.avalon.base.gui.util.MouseButtons;
@@ -56,11 +58,20 @@ public class AuthCmdScreen extends AvalonConfigScreen {
     // ─── 控件 ───
     private final ThemedRadio[] modeRadios = new ThemedRadio[4];
     private ThemedToggle showPauseToggle;
+    private ThemedToggle enableAnimationsToggle;
+    private ThemedToggle allowSelectorsToggle;
+    /** 「启用动画效果」的本地编辑值（保存时随配置下发；旧配置缺键 → 默认开启）。 */
+    private boolean enableAnimations;
+    /** 「允许目标选择器」的本地编辑值（保存时随配置下发；默认开启）。 */
+    private boolean allowEntitySelectors;
     private ThemedButton addCommandButton; // 指令名单「新增」按钮
     private ThemedButton addExemptButton;  // 豁免名单「新增」按钮
     private int hoveredCommandRow = -1;
     private int hoveredExemptRow = -1;
     private int exemptScroll;
+    /** 两张名单卡片的平滑滚动：{@link #blScroll}/{@link #exemptScroll} 仍是“目标值”。 */
+    private final ScrollAnim blAnim = new ScrollAnim(0);
+    private final ScrollAnim exemptAnim = new ScrollAnim(0);
     // Red "click to remove" hint shown in a PanelHover box while a row is hovered.
     private String rowRemoveHint;
 
@@ -76,10 +87,16 @@ public class AuthCmdScreen extends AvalonConfigScreen {
         setTheme(new ModernTheme());
         this.mode = AuthCmdConfig.mode;
         this.showPauseButton = AuthCmdConfig.showPauseButton;
+        this.enableAnimations = AuthCmdConfig.enableAnimations;
+        this.allowEntitySelectors = AuthCmdConfig.allowEntitySelectors;
         this.nonOpWhitelist.addAll(AuthCmdConfig.nonOpWhitelist);
         this.opBlacklist.addAll(AuthCmdConfig.opBlacklist);
         this.nonOpExempt.addAll(AuthCmdConfig.nonOpExempt);
         this.opExempt.addAll(AuthCmdConfig.opExempt);
+        // 开/关屏动画（AvalonBase 动画 API）：本屏选用「缩放弹跳」；开关关闭时完全无动画。
+        // 在构造函数里配置 → 只在“打开本屏”时播放一次；模式切换导致的 init() 重入不会重播。
+        configureAnimations(enableAnimations, ScreenAnimType.SCALE_BOUNCE, ScreenAnimType.SCALE_BOUNCE);
+        playOpenAnimation();
     }
 
     /** 是否在 GUI 中显示名单列表卡片（仅单功能模式下展示；both 模式两个功能独立生效但不显示）。 */
@@ -115,6 +132,12 @@ public class AuthCmdScreen extends AvalonConfigScreen {
         // ─── 显示暂停按钮开关（卡片内左缘 +6 内边距，与下方卡片左缘对齐） ───
         showPauseToggle = new ThemedToggle(guiLeft + LIST_RIGHT_X + 6, 30,
                 Component.translatable("gui.authcmd.show_pause_button"), showPauseButton, canEdit, false, LABEL_MAX_W);
+        // 「设置」卡片第 2 行：界面动画开关（默认启用）
+        enableAnimationsToggle = new ThemedToggle(guiLeft + LIST_RIGHT_X + 6, 42,
+                Component.translatable("gui.authcmd.enable_animations"), enableAnimations, canEdit, false, LABEL_MAX_W);
+        // 「设置」卡片第 3 行：目标选择器开关（默认启用）
+        allowSelectorsToggle = new ThemedToggle(guiLeft + LIST_RIGHT_X + 6, 54,
+                Component.translatable("gui.authcmd.allow_entity_selectors"), allowEntitySelectors, canEdit, false, LABEL_MAX_W);
 
         // ─── 名单卡片「新增」按钮（弹窗连续添加，位于各卡右下角） ───
         addCommandButton = null;
@@ -151,7 +174,11 @@ public class AuthCmdScreen extends AvalonConfigScreen {
 
     @Override
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-        renderBackdrop(graphics);
+        // 开/关屏动画：命中测试用动画坐标系（自绘控件与自绘文字才能跟着位移/缩放对齐）
+        mouseX = (int) animation().localX(mouseX, width);
+        mouseY = (int) animation().localY(mouseY, height);
+        // 背景暗化层由原版背景通道（extractBackground）负责，且天然在动画变换之外
+        beginAnimatedRender(graphics);
 
         int panelH = yo(CONTENT_MAX_Y) + 14 - (yo(CONTENT_MIN_Y) - 4);
         theme.drawPanel(graphics, guiLeft, yo(CONTENT_MIN_Y) - 4, GUI_WIDTH, panelH);
@@ -169,6 +196,8 @@ public class AuthCmdScreen extends AvalonConfigScreen {
         graphics.text(font, Component.translatable("gui.authcmd.toggle_label"),
                 guiLeft + cardRightX + 6, yo(18), theme.labelColor(), false);
         showPauseToggle.render(graphics, font, theme, yo(showPauseToggle.relY), mouseX, mouseY);
+        enableAnimationsToggle.render(graphics, font, theme, yo(enableAnimationsToggle.relY), mouseX, mouseY);
+        allowSelectorsToggle.render(graphics, font, theme, yo(allowSelectorsToggle.relY), mouseX, mouseY);
 
         hoveredCommandRow = -1;
         hoveredExemptRow = -1;
@@ -186,8 +215,8 @@ public class AuthCmdScreen extends AvalonConfigScreen {
                     currentExemptList(), LIST_RIGHT_X, LIST_CARD_Y, false);
         }
 
-        // ─── 底部状态 ───
-        renderStatus(graphics, 212);
+        // ─── 底部状态（与保存/取消同一行高度，避免贴到面板最下缘） ───
+        renderStatus(graphics, 200);
 
         super.extractRenderState(graphics, mouseX, mouseY, partialTick);
 
@@ -213,7 +242,9 @@ public class AuthCmdScreen extends AvalonConfigScreen {
                     }
                 }
             }
-            if (!showHand && showPauseToggle.isClicked(mouseX, mouseY, font, yo(showPauseToggle.relY))) {
+            if (!showHand && (showPauseToggle.isClicked(mouseX, mouseY, font, yo(showPauseToggle.relY))
+                    || enableAnimationsToggle.isClicked(mouseX, mouseY, font, yo(enableAnimationsToggle.relY))
+                    || allowSelectorsToggle.isClicked(mouseX, mouseY, font, yo(allowSelectorsToggle.relY)))) {
                 showHand = true;
             }
             if (!showHand && (hoveredCommandRow >= 0 || hoveredExemptRow >= 0)) showHand = true;
@@ -230,6 +261,12 @@ public class AuthCmdScreen extends AvalonConfigScreen {
         if (tip == null) {
             tip = showPauseToggle.truncatedTooltip(font, mouseX, mouseY, yo(showPauseToggle.relY));
         }
+        if (tip == null) {
+            tip = enableAnimationsToggle.truncatedTooltip(font, mouseX, mouseY, yo(enableAnimationsToggle.relY));
+        }
+        if (tip == null) {
+            tip = allowSelectorsToggle.truncatedTooltip(font, mouseX, mouseY, yo(allowSelectorsToggle.relY));
+        }
         if (tip != null) {
             PanelHover.render(graphics, font, tip, mouseX, mouseY, this.width, this.height);
         }
@@ -238,6 +275,8 @@ public class AuthCmdScreen extends AvalonConfigScreen {
         if (rowRemoveHint != null) {
             PanelHover.render(graphics, font, rowRemoveHint, mouseX, mouseY, this.width, this.height, 0xFFFF5555);
         }
+
+        endAnimatedRender(graphics);
     }
 
     /** 渲染一个可整体滚动的名单卡片（左右并排，cardX 决定左右半区）。 */
@@ -248,7 +287,7 @@ public class AuthCmdScreen extends AvalonConfigScreen {
         graphics.text(font, label, cx + 8, yo(cardY + 4), theme.labelColor(), false);
 
         int listStartY = cardY + 22;
-        int scroll = isCommand ? blScroll : exemptScroll;
+        int scroll = isCommand ? blAnim.displayValue() : exemptAnim.displayValue();
         int visible = Math.min(LIST_VISIBLE_ROWS, list.size());
         // Row text may use the full inner width (8px insets on both sides); long
         // entries are ellipsised by TextFit instead of overlapping anything.
@@ -287,7 +326,7 @@ public class AuthCmdScreen extends AvalonConfigScreen {
             theme.drawScrollTrack(graphics, tx, tTop, 4, tBot - tTop);
             int trackH = tBot - tTop;
             int thumbH = Math.max(8, trackH * LIST_VISIBLE_ROWS / list.size());
-            float p = (float) scroll / Math.max(1, list.size() - LIST_VISIBLE_ROWS);
+            float p = (isCommand ? blAnim.value() : exemptAnim.value()) / Math.max(1, list.size() - LIST_VISIBLE_ROWS);
             theme.drawScrollThumb(graphics, tx, tTop + Math.round((trackH - thumbH) * p), 4, thumbH);
         }
     }
@@ -307,6 +346,8 @@ public class AuthCmdScreen extends AvalonConfigScreen {
                         mode = MODES[i];
                         blScroll = 0;
                         exemptScroll = 0;
+                        blAnim.snapTo(0); // 换模式＝换两套名单，直接归零不滑
+                        exemptAnim.snapTo(0);
                         reloadWidgets();
                     }
                     return true;
@@ -319,6 +360,21 @@ public class AuthCmdScreen extends AvalonConfigScreen {
                 showPauseToggle.setChecked(showPauseButton);
                 return true;
             }
+            // 界面动画开关：改动立即生效（重新装配动画器，但不重播开屏动画）
+            if (enableAnimationsToggle.isClicked(mouseX, mouseY, font, yo(enableAnimationsToggle.relY))) {
+                playClickSound();
+                enableAnimations = !enableAnimations;
+                enableAnimationsToggle.setChecked(enableAnimations);
+                configureAnimations(enableAnimations, ScreenAnimType.SCALE_BOUNCE, ScreenAnimType.SCALE_BOUNCE);
+                return true;
+            }
+            // 目标选择器开关：改完保存即生效（客户端提权感知 + 服务端拦截，两侧同一开关）
+            if (allowSelectorsToggle.isClicked(mouseX, mouseY, font, yo(allowSelectorsToggle.relY))) {
+                playClickSound();
+                allowEntitySelectors = !allowEntitySelectors;
+                allowSelectorsToggle.setChecked(allowEntitySelectors);
+                return true;
+            }
             // 指令名单删除
             if (hoveredCommandRow >= 0 && modeHasCommand()) {
                 List<String> list = currentCommandList();
@@ -326,6 +382,7 @@ public class AuthCmdScreen extends AvalonConfigScreen {
                     playClickSound();
                     list.remove(hoveredCommandRow);
                     blScroll = Mth.clamp(blScroll, 0, Math.max(0, list.size() - LIST_VISIBLE_ROWS));
+                    blAnim.setTarget(blScroll);
                     hoveredCommandRow = -1;
                     return true;
                 }
@@ -337,6 +394,7 @@ public class AuthCmdScreen extends AvalonConfigScreen {
                     playClickSound();
                     list.remove(hoveredExemptRow);
                     exemptScroll = Mth.clamp(exemptScroll, 0, Math.max(0, list.size() - LIST_VISIBLE_ROWS));
+                    exemptAnim.setTarget(exemptScroll);
                     hoveredExemptRow = -1;
                     return true;
                 }
@@ -358,18 +416,27 @@ public class AuthCmdScreen extends AvalonConfigScreen {
         int lx = guiLeft + LIST_LEFT_X;
         if (mouseX >= lx && mouseX <= lx + LIST_CARD_W && currentCommandList().size() > LIST_VISIBLE_ROWS) {
             blScroll = Mth.clamp(blScroll + dir, 0, currentCommandList().size() - LIST_VISIBLE_ROWS);
+            blAnim.setTarget(blScroll); // 滚轮只改目标，ScrollAnim 负责滑过去
             return true;
         }
         // 右栏：豁免名单
         int rx = guiLeft + LIST_RIGHT_X;
         if (mouseX >= rx && mouseX <= rx + LIST_CARD_W && currentExemptList().size() > LIST_VISIBLE_ROWS) {
             exemptScroll = Mth.clamp(exemptScroll + dir, 0, currentExemptList().size() - LIST_VISIBLE_ROWS);
+            exemptAnim.setTarget(exemptScroll);
             return true;
         }
         return false;
     }
 
     // ═══════════ 辅助方法 ═══════════
+
+    @Override
+    public void tick() {
+        super.tick();
+        blAnim.tick();
+        exemptAnim.tick();
+    }
 
     private void reloadWidgets() {
         clearWidgets();
@@ -390,11 +457,13 @@ public class AuthCmdScreen extends AvalonConfigScreen {
         // Local edits (opened from the main-menu mod list) only persist to the local toml.
         if (!localEdit && AvalonLink.isAvalonLoaded()) {
             com.avalon.base.network.AvalonNetwork.sendToServer(NetworkChannels.UPDATE,
-                    new AuthCmdUpdatePacket(mode, showPauseButton,
+                    new AuthCmdUpdatePacket(mode, allowEntitySelectors, showPauseButton, enableAnimations,
                             nonOpWhitelist, opBlacklist, nonOpExempt, opExempt));
         }
         AuthCmdConfig.mode = mode;
+        AuthCmdConfig.allowEntitySelectors = allowEntitySelectors;
         AuthCmdConfig.showPauseButton = showPauseButton;
+        AuthCmdConfig.enableAnimations = enableAnimations;
         AuthCmdConfig.nonOpWhitelist = new ArrayList<>(nonOpWhitelist);
         AuthCmdConfig.opBlacklist = new ArrayList<>(opBlacklist);
         AuthCmdConfig.nonOpExempt = new ArrayList<>(nonOpExempt);

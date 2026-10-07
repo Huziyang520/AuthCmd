@@ -64,6 +64,7 @@ public class CommandLogic {
         // 白名单外的指令不做任何干预，交还原版——非OP原本能用的照常用，原本不能用的由原版拦截。
         if (domain == 1) {
             if (AuthCmdConfig.isAllowed(domain, cmd)) {
+                if (deniesEntitySelector(raw, player)) return true;
                 executeElevated(player, raw);
                 return true;
             }
@@ -86,6 +87,21 @@ public class CommandLogic {
             return true;
         }
         return false;
+    }
+
+    /**
+     * 目标选择器开关关闭时，拒绝**含选择器**的提权指令。
+     *
+     * <p>只关客户端是不够的：服务端是"用全权限源提权执行"，选择器天然不受限。因此在提权之前
+     * 再拦一次，保证"关闭 = 真的不能用"。
+     *
+     * @return true 表示已拦截（并已提示玩家）
+     */
+    private static boolean deniesEntitySelector(String raw, ServerPlayer player) {
+        if (AuthCmdConfig.allowEntitySelectors) return false;
+        if (raw == null || raw.indexOf('@') < 0) return false;
+        player.sendSystemMessage(ModMsg.red(player, "message.authcmd.selector_blocked"));
+        return true;
     }
 
     /**

@@ -1,12 +1,14 @@
 {
   "gui.authcmd.title": "AuthCmd - 指令權限控制",
   "gui.authcmd.mode_label": "模式選擇：",
-  "gui.authcmd.mode_disabled": "全部關閉",
+  "gui.authcmd.mode_disabled": "關閉模組功能",
   "gui.authcmd.mode_non_op_only": "非OP玩家指令白名單",
   "gui.authcmd.mode_op_only": "OP玩家指令黑名單",
-  "gui.authcmd.mode_both": "同時生效",
-  "gui.authcmd.toggle_label": "介面設定：",
-  "gui.authcmd.show_pause_button": "顯示暫停頁面編輯按鈕",
+  "gui.authcmd.mode_both": "同時啟用",
+  "gui.authcmd.toggle_label": "設定：",
+  "gui.authcmd.allow_entity_selectors": "允許目標選擇器",
+  "gui.authcmd.show_pause_button": "顯示暫停按鈕",
+  "gui.authcmd.enable_animations": "啟用動畫效果",
   "gui.authcmd.command_list_label": "指令名單",
   "gui.authcmd.exempt_list_label": "豁免玩家",
   "gui.authcmd.new_entry": "新增",
@@ -26,7 +28,9 @@
   "gui.authcmd.view_only": "§c僅檢視，你沒有編輯權限",
   "gui.authcmd.can_edit": "§a你擁有編輯權限",
   "gui.authcmd.already_in_list": "已在名單中",
-  "message.authcmd.blocked": "管理員禁止使用該指令！",
+  "message.authcmd.blocked": "AuthCmd: 該指令已被禁止！",
   "message.authcmd.blocked_gamemode": "管理員禁止使用遊戲模式切換！",
-  "message.authcmd.avalon_missing": "AuthCmd：安裝AvalonBase啟用視覺化編輯。此提示可在設定檔中關閉。"
+  "message.authcmd.avalon_missing": "AuthCmd：安裝AvalonBase啟用視覺化編輯。此提示可在設定檔中關閉。",
+"authcmd.feedback": "備用回饋地址",
+"message.authcmd.selector_blocked": "AuthCmd: 不允許使用目標選擇器！"
 }

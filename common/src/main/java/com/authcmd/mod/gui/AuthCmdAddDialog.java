@@ -1,8 +1,11 @@
 package com.authcmd.mod.gui;
 
+import com.avalon.base.gui.anim.ScreenAnim;
+import com.avalon.base.gui.anim.ScreenAnimType;
 import com.avalon.base.gui.theme.GuiTheme;
 import com.avalon.base.gui.theme.ModernTheme;
 import com.avalon.base.gui.theme.ThemedButton;
+import com.authcmd.mod.config.AuthCmdConfig;
 import com.authcmd.mod.util.ModMsg;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -39,6 +42,10 @@ public class AuthCmdAddDialog extends Screen {
     private ThemedButton addButton;
     private ThemedButton doneButton;
 
+    /** 二级弹窗的开/关动画（与主编辑界面同一类型）；「启用动画效果」关闭时完全无动画。 */
+    private final ScreenAnim anim;
+    private boolean closeDone;
+
     public AuthCmdAddDialog(Screen parent, boolean command, List<String> targetList) {
         super(Component.translatable(command
                 ? "gui.authcmd.add_command_title" : "gui.authcmd.add_exempt_title"));
@@ -46,6 +53,10 @@ public class AuthCmdAddDialog extends Screen {
         this.command = command;
         this.targetList = targetList;
         this.theme = new ModernTheme();
+        this.anim = AuthCmdConfig.enableAnimations
+                ? new ScreenAnim(ScreenAnimType.SCALE_BOUNCE, ScreenAnimType.SCALE_BOUNCE)
+                : ScreenAnim.disabled();
+        this.anim.playOpen();
     }
 
     @Override
@@ -115,12 +126,17 @@ public class AuthCmdAddDialog extends Screen {
 
     @Override
     public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
-        // no-op：抑制默认背景绘制
+        // 背景通道交给原版（主菜单 = 全景图 + 模糊 + 菜单背景贴图；世界内 = 模糊 + 半透明暗底）。
+        // 它同样位于动画变换之外，动画期间整屏始终是暗的，不会出现"弹窗变小、四周露出一圈更亮"的分层。
+        super.extractBackground(g, mouseX, mouseY, partialTick);
     }
 
     @Override
     public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
-        g.fill(0, 0, this.width, this.height, 0x55000000);
+        // 动画：命中测试用动画坐标系，位姿变换只作用于弹窗本体
+        mouseX = (int) anim.localX(mouseX, width);
+        mouseY = (int) anim.localY(mouseY, height);
+        anim.beginFrame(g, width, height);
         int x = (width - DIALOG_W) / 2;
         int y = (height - DIALOG_H) / 2;
         theme.drawPanel(g, x, y, DIALOG_W, DIALOG_H);
@@ -142,6 +158,9 @@ public class AuthCmdAddDialog extends Screen {
         if (!showHand && doneButton.isHovered()) showHand = true;
         if (!showHand && input.isMouseOver(mouseX, mouseY)) showHand = true;
         setCursor(g, showHand);
+
+        anim.endFrame(g, width, height);
+        if (anim.isCloseFinished()) backToParent();
     }
 
     /**
@@ -173,9 +192,24 @@ public class AuthCmdAddDialog extends Screen {
         return super.keyPressed(event);
     }
 
+    /** 真正切回父界面（有关闭动画时由动画播完后调用；幂等）。 */
+    private void backToParent() {
+        if (closeDone) return;
+        closeDone = true;
+        minecraft.setScreenAndShow(parent);
+    }
+
     @Override
     public void onClose() {
-        minecraft.setScreenAndShow(parent);
+        // 有关闭动画 → 先播动画，播完再回父界面
+        if (anim.beginClose()) return;
+        backToParent();
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (anim.isCloseFinished()) backToParent();
     }
 
     @Override

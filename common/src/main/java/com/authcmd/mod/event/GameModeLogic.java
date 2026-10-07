@@ -78,26 +78,26 @@ public class GameModeLogic {
     }
 
     /**
-     * 客户端 F3+F4 切换器入口/发包的放行判定（宽松）。
+     * 客户端 F3+F4 切换器入口/发包的放行判定（<b>严格</b>，2026-10-07 口径修正）。
      *
-     * <p>只判定「功能一（非OP白名单）是否生效」与「本地玩家是否非OP」，<b>不在客户端做名单二次判定</b>：
-     * 客户端名单可能滞后——未装 AvalonBase 时客户端不注册网络接收器（{@code CommonClass.init} 直接返回），
-     * 收不到服务端下发的配置同步；联机首帧也存在时间窗。若在客户端按本地名单拦截，就会出现
-     * 「名单内命令可用（服务端提权执行）、但 F3+F4 切换器打不开（客户端被本地空名单挡下）」的不一致。
+     * <p>口径：<b>只有</b>「功能一（非OP白名单）生效 + 名单里写入了 {@code gamemode}/{@code g}
+     * + 该玩家未被豁免」时才放行入口；否则一律返回 {@code false}，让原版走自己的拒绝分支——
+     * {@code KeyboardHandler.handleDebugKeys} 会打出 {@code debug.gamemodes.error}
+     *（中文即「[调试]：你没有权限打开游戏模式切换器」）并且<b>不打开</b>切换器界面，
+     * 表现与未启用本模组时完全一致。
      *
-     * <p>真正是否允许切换由服务端 {@link #shouldBlock} 依据名单统一把关：白名单命中 → 放行；
-     * 未命中 → 拦截 + 红字提示。服务端未生效（{@code mode=disabled} 等）时，服务端
-     * {@link #shouldAllowGameModeChange} 仍会把包交还原版权限检查，非OP 无法切换。
+     * <p><b>为什么不再宽松</b>：旧实现（2026-10-01）只判「功能一是否生效」，理由是想绕开
+     * 「未装 AvalonBase 的客户端收不到 SYNC ⇒ 本地名单恒空 ⇒ 界面打不开」的不一致；代价是
+     * <b>名单里没写 {@code gamemode} 时非OP 依然能看到切换器</b>，与「名单决定是否可用」的语义相反。
+     * 现在改为严格判定：客户端名单为空（含尚未收到 SYNC 的联机首帧）⇒ 打不开，需等服务端
+     * 下发配置；真正的把关仍由服务端 {@link #shouldBlock} / {@link #shouldAllowGameModeChange} 承担，
+     * 客户端放行不会造成越权（服务端未放行时切换仍会被回滚）。
      *
      * @param player 客户端本地玩家（{@code LocalPlayer}，以 {@link Player} 形参传入以避免 common 侧引用客户端类）
      * @return true 表示应绕过原版权限检查，放行切换器打开/切换
      */
     public static boolean shouldAllowGameModeSwitcher(Player player) {
-        if (player == null) return false;
-        if (player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)) return false; // OP 走原版逻辑即可
-        // 尚未收到服务端配置：本地无从判定，放行入口交服务端把关（服务端未生效时按原版拒绝，无越权风险）
-        if (!AuthCmdConfig.isClientConfigSynced()) return true;
-        return AuthCmdConfig.resolveDomain(false) == 1; // 仅功能一（非OP白名单）生效时放行
+        return shouldAllowGameModeChange(player);
     }
 
     /**

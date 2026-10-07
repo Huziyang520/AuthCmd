@@ -11,10 +11,10 @@ import java.util.List;
  */
 public class AuthCmdSyncPacket extends AuthCmdConfigPacket {
 
-    public AuthCmdSyncPacket(String mode, boolean showPauseButton,
+    public AuthCmdSyncPacket(String mode, boolean allowEntitySelectors, boolean showPauseButton, boolean enableAnimations,
                              List<String> nonOpWhitelist, List<String> opBlacklist,
                              List<String> nonOpExempt, List<String> opExempt) {
-        super(mode, showPauseButton, nonOpWhitelist, opBlacklist, nonOpExempt, opExempt);
+        super(mode, allowEntitySelectors, showPauseButton, enableAnimations, nonOpWhitelist, opBlacklist, nonOpExempt, opExempt);
     }
 
     public AuthCmdSyncPacket(FriendlyByteBuf buf) {
