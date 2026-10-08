@@ -1,70 +1,142 @@
+**English** | [中文](#中文)
+
+---
+
 # AuthCmd
 
-> 一个基于可配置权限名单，限制玩家**能执行的指令**与**能切换的游戏模式**的 Minecraft 1.20.1 模组。
+> A command-permission controller for Minecraft servers: decide exactly which commands each player is allowed to use.
 
-## 基本信息
+## What it does
 
-| 项 | 值 |
+AuthCmd gives server owners two independent rule sets plus one shared behaviour:
+
+| Rule set | Applies to | Meaning |
+|---|---|---|
+| **Non-OP whitelist** | regular players | The commands you list become **usable by regular players** (they are normally operator-only). Everything else keeps its vanilla behaviour. |
+| **OP blacklist** | operators | The commands you list become **blocked for operators**. Everything else stays available. |
+| **Game mode switching** | both | `/gamemode`, `/g` and the F3 + F4 game mode switcher follow the `gamemode` entry of the rule set that applies to the player. Add `gamemode` to the list to allow it, leave it out to block it. |
+
+Each rule set has its **own exemption list**: players on it are completely ignored by that rule set.
+
+Four modes are available: **disabled**, **non-OP whitelist only**, **OP blacklist only**, or **both**.
+
+## Quick start
+
+1. Put the mod file into your server's `mods` folder (Fabric or NeoForge).
+2. Start the server once. The config file `config/authcmd.toml` is created automatically.
+3. Either edit that file, or use the in-game editor (see below).
+4. Pick a mode, fill in the command list and the exemption list, save.
+
+## The in-game editor
+
+- Open it from the **pause menu** (the mod's edit button) or from the **mod list** → *AuthCmd* → *Config*.
+- The visual editor needs the optional library **AvalonBase** installed on the client, plus operator permission on the server. Without AvalonBase the mod still works — you just edit the config file by hand.
+  - AvalonBase: <https://www.curseforge.com/minecraft/mc-mods/avalonbase>
+- If the server owner turned the edit entry off, the mod list entry still opens, but only shows a short "entry closed" notice.
+- The editor's *Interface* section contains a **Show pause button** switch and an **Enable interface animations** switch (both on by default).
+
+## Chat messages
+
+Blocked commands answer with a red `AuthCmd: This command has been disabled!`. Blocked game mode switching answers with `AuthCmd:`-style red text about game mode switching.
+
+## Config file
+
+`config/authcmd.toml` — the file is plain TOML and can be edited by hand at any time; changes are picked up **without restarting the server**.
+
+| Key | Meaning |
 |---|---|
-| 名称 | AuthCmd |
-| Mod ID | `authcmd` |
-| 版本 | `1.0.0` |
-| 支持平台 | Forge `47.2.x` / Fabric Loader `0.16.9` / NeoForge 1.20.1 |
-| 前置 | AvalonBase（可选，仅用于暂停页面的可视化编辑界面） |
-| 作者 | Huziyang520 |
-| 开源协议 | MIT |
-| 反馈 | [GitHub Issues](https://github.com/Huziyang520/AuthCmd/issues) / [issue.mengcai.online](https://issue.mengcai.online/) |
+| `mode` | `disabled` / `non_op_only` / `op_only` / `both` |
+| `show_pause_button` | Show the edit button in the pause menu |
+| `enable_animations` | Interface open/close animations |
+| `non_op_whitelist` / `op_blacklist` | The command lists |
+| `non_op_exempt` / `op_exempt` | The exemption lists |
 
-## 模组功能
+## Good to know
 
-AuthCmd 提供**两套独立的指令/游戏模式权限控制**，按玩家是否为 OP 分别生效：
+- The non-OP whitelist **only grants extra permissions** — it never takes commands away from regular players.
+- Command names are matched case-insensitively; a leading `/` is ignored.
+- `/gamemode` and `/g` are treated as the same command.
+- Everything is decided on the **server**; installing the mod on the client only adds the visual editor.
 
-### 功能一：非OP玩家指令白名单
-- 对**非OP玩家**生效。
-- 白名单（`non_op_whitelist`）内的指令被**提权放行**：即使原本需要权限2才能使用，非OP也能正常执行；白名单外的指令**不做拦截**，交还原版处理（非OP原本能用则照常用，原本不能用则由原版拦截）。
-- **支持 Tab 补全**：白名单内的指令对非OP玩家也能正常补全（命令树按白名单动态放行）。
-- 白名单条目支持 `gamemode` 这种根命令，命中后其子命令一并放行。
+## Links
 
+- Project page: <https://www.curseforge.com/minecraft/mc-mods/authcmd>
+- Feedback (backup): <https://issue.mengcai.online/>
 
-### 功能二：OP玩家指令黑名单
-- 对 **OP玩家**生效。
-- 黑名单（`op_blacklist`）内的指令被拦截，其余可正常使用。
+## License
 
-### 游戏模式限制
-- 可单独限制 OP / 非OP 玩家能否切换游戏模式（`gamemode` 命令）。
-- 支持按玩家/命令细粒度豁免。
+MIT — author: Huziyang520
 
-### 豁免玩家
-- 在豁免名单（`non_op_exempt` / `op_exempt`）中的玩家**完全放行**，不受上述限制。
+---
+---
 
-### 四种生效模式
-`mode` 配置可选：
-- `disabled`：全部关闭（模组不干预）
-- `non_op_only`：仅功能一（非OP白名单）生效
-- `op_only`：仅功能二（OP黑名单）生效
-- `both`：功能一、功能二同时生效
+<a id="中文"></a>
 
-## 配置说明
+[English](#authcmd) | **中文**
 
-配置文件：`config/authcmd.toml`，包含：
-- `mode`：生效模式
-- `show_pause_button`：是否显示暂停页面编辑按钮
-- `show_tips`：进入世界时（未装 AvalonBase）是否显示可视化编辑提示
-- `non_op_whitelist`：非OP指令白名单
-- `op_blacklist`：OP指令黑名单
-- `non_op_exempt` / `op_exempt`：豁免玩家名单
+---
 
-配置变更后，会**自动向所有在线玩家重发命令树**，客户端补全即时更新。
+# AuthCmd
 
-## 与 AvalonBase 的关系（可选联动）
+> Minecraft 服务端的指令权限控制器：精确决定"哪个玩家能用哪些指令"。
 
-- **未安装 AvalonBase**：AuthCmd 作为纯服务端模组独立运行，完全靠 `config/authcmd.toml` 驱动核心功能（指令限制、游戏模式限制、Tab 补全），一切正常。
-- **安装 AvalonBase**：额外获得暂停页面上的**可视化编辑按钮**，可在游戏内直接编辑上述名单（无需手动改配置）。
-- 若未装 AvalonBase 且配置允许，进入世界时会在聊天框提示"安装 AvalonBase 可启用可视化编辑"（可用 `show_tips` 关闭）。
+## 它做什么
 
-## 技术信息
+AuthCmd 给服主提供两套互相独立的规则，外加一个共用行为：
 
-- 游戏版本：Minecraft 1.20.1
-- Java 17
-- 构建：MultiLoader（common / fabric / forge 三模块）
-- 平台无关逻辑位于 common，网络层经 AvalonBase 的 `AvalonNetwork` 抽象（未装时通过反射探测自动跳过）
+| 规则 | 作用对象 | 含义 |
+|---|---|---|
+| **非OP 玩家指令白名单** | 普通玩家 | 名单里写的指令，**普通玩家也能使用**（这些指令原本只有OP能用）。名单外的指令保持原版行为不变。 |
+| **OP 玩家指令黑名单** | 管理员（OP） | 名单里写的指令，**管理员也不能使用**。名单外的指令照常可用。 |
+| **游戏模式切换** | 两者 | `/gamemode`、`/g` 与 F3+F4 游戏模式切换器，都跟随该玩家所处规则里的 `gamemode` 条目：名单里写了就能用，没写就别用。 |
+
+每套规则还各有**一份豁免名单**：在豁免名单里的玩家完全不受该规则约束。
+
+共 4 种模式：**全关闭**、**仅非OP白名单**、**仅OP黑名单**、**同时启用**。
+
+## 快速开始
+
+1. 把模组文件放进服务端的 `mods` 文件夹（Fabric 或 NeoForge）。
+2. 启动一次服务端，会自动生成配置文件 `config/authcmd.toml`。
+3. 直接改这个文件，或者用游戏内编辑界面（见下）。
+4. 选好模式、填好指令名单与豁免名单，保存即可。
+
+## 游戏内编辑界面
+
+- 从**暂停菜单**的编辑按钮进入，或从**模组列表** → *AuthCmd* → *配置* 进入。
+- 可视化编辑界面需要客户端安装可选前置库 **AvalonBase**，并且在服务端拥有管理员权限；不装 AvalonBase 也能正常使用，只是只能手改配置文件。
+  - AvalonBase 下载：<https://www.curseforge.com/minecraft/mc-mods/avalonbase>
+- 如果服主关闭了编辑入口，模组列表入口仍会打开，但只显示一句"服务端关闭了编辑页面入口"的提示。
+- 界面的「界面设置」里有 **显示暂停按钮** 与 **启用动画效果** 两个开关（默认都开启）。
+
+## 聊天提示
+
+被拦截的指令会收到红字 `AuthCmd: 该指令已被禁止！`；被拦截的游戏模式切换则显示对应的游戏模式切换提示。
+
+## 配置文件
+
+`config/authcmd.toml` —— 纯 TOML 文本，随时可以手改，**改动无需重启服务端**即可生效。
+
+| 键 | 含义 |
+|---|---|
+| `mode` | `disabled` / `non_op_only` / `op_only` / `both` |
+| `show_pause_button` | 是否显示暂停菜单里的编辑按钮 |
+| `enable_animations` | 是否启用界面开/关动画 |
+| `non_op_whitelist` / `op_blacklist` | 指令名单 |
+| `non_op_exempt` / `op_exempt` | 豁免玩家名单 |
+
+## 使用须知
+
+- 非OP 白名单**只做"额外放行"**，不会夺走普通玩家原本就能用的指令。
+- 指令名不区分大小写，开头的 `/` 会被忽略。
+- `/gamemode` 与 `/g` 视为同一条指令。
+- 所有判定都在**服务端**完成；客户端装本模组只是为了获得可视化编辑界面。
+
+## 相关链接
+
+- 项目主页：<https://www.curseforge.com/minecraft/mc-mods/authcmd>
+- 备用反馈地址：<https://issue.mengcai.online/>
+
+## 许可证
+
+MIT —— 作者：Huziyang520
