@@ -1,113 +1,142 @@
-🔒 OnlyTP
+**English** | [中文](#中文)
 
-Minecraft 指令限制模组 | Minecraft Command Restriction Mod
+---
 
-⚠️ WARNING
-In versions 2026.8.16 and later, the visual editing interface requires the AvalonBase mod to be installed in order to display. Otherwise, modifications can only be made through the configuration file. If the configuration file items are incomplete, you can delete the configuration file and the game will automatically recreate it. ⚠️
+# AuthCmd
 
-⚠️ 警告
-在 2026.8.16 及以后的版本中，可视化编辑界面需要安装 AvalonBase 模组才能显示，否则只能通过配置文件进行修改。若配置文件项目不完全，可删除配置文件，游戏会自动创建。 ⚠️
+> A command-permission controller for Minecraft servers: decide exactly which commands each player is allowed to use.
 
-📖 Features
+## What it does
 
-OnlyTP provides three command restriction modes to help server administrators precisely control player command permissions:
+AuthCmd gives server owners two independent rule sets plus one shared behaviour:
 
-Mode 1: TP Only
+| Rule set | Applies to | Meaning |
+|---|---|---|
+| **Non-OP whitelist** | regular players | The commands you list become **usable by regular players** (they are normally operator-only). Everything else keeps its vanilla behaviour. |
+| **OP blacklist** | operators | The commands you list become **blocked for operators**. Everything else stays available. |
+| **Game mode switching** | both | `/gamemode`, `/g` and the F3 + F4 game mode switcher follow the `gamemode` entry of the rule set that applies to the player. Add `gamemode` to the list to allow it, leave it out to block it. |
 
-Non-OP players can only use /tp and /teleport commands. Other commands are intercepted and executed with elevated privileges. OP players are unrestricted.
+Each rule set has its **own exemption list**: players on it are completely ignored by that rule set.
 
-Mode 2: Block Non-TP
+Four modes are available: **disabled**, **non-OP whitelist only**, **OP blacklist only**, or **both**.
 
-OP players can only use TP commands. Using other commands will be blocked with a notification. Non-OP players are unrestricted. The F3+F4 game mode switcher is also blocked for OP players.
+## Quick start
 
-Mode 3: Both Enabled
+1. Put the mod file into your server's `mods` folder (Fabric or NeoForge).
+2. Start the server once. The config file `config/authcmd.toml` is created automatically.
+3. Either edit that file, or use the in-game editor (see below).
+4. Pick a mode, fill in the command list and the exemption list, save.
 
-Both rules are applied simultaneously. Non-OP players can only use TP commands, and OP players can also only use TP commands.
+## The in-game editor
 
-⚫ Blacklist System
+- Open it from the **pause menu** (the mod's edit button) or from the **mod list** → *AuthCmd* → *Config*.
+- The visual editor needs the optional library **AvalonBase** installed on the client, plus operator permission on the server. Without AvalonBase the mod still works — you just edit the config file by hand.
+  - AvalonBase: <https://www.curseforge.com/minecraft/mc-mods/avalonbase>
+- If the server owner turned the edit entry off, the mod list entry still opens, but only shows a short "entry closed" notice.
+- The editor's *Interface* section contains a **Show pause button** switch and an **Enable interface animations** switch (both on by default).
 
-Each mode has an independent blacklist. Blacklisted players are completely exempt from that mode's restrictions and can freely use all commands.
+## Chat messages
 
-🎨 Dual-Style GUI Configuration
+Blocked commands answer with a red `AuthCmd: This command has been disabled!`. Blocked game mode switching answers with `AuthCmd:`-style red text about game mode switching.
 
-Modern Purple-Black Style: Dark background, purple borders, sharp-cornered design
+## Config file
 
-Vanilla Chest Style: Mimics the original Minecraft interface style
+`config/authcmd.toml` — the file is plain TOML and can be edited by hand at any time; changes are picked up **without restarting the server**.
 
-LAN hosts or server administrators can open the configuration panel via the "TP" button in the pause menu or through commands. All changes are instantly synced to all players.
+| Key | Meaning |
+|---|---|
+| `mode` | `disabled` / `non_op_only` / `op_only` / `both` |
+| `show_pause_button` | Show the edit button in the pause menu |
+| `enable_animations` | Interface open/close animations |
+| `non_op_whitelist` / `op_blacklist` | The command lists |
+| `non_op_exempt` / `op_exempt` | The exemption lists |
 
-🚀 Usage
+## Good to know
 
-Place the mod jar file into the mods folder
+- The non-OP whitelist **only grants extra permissions** — it never takes commands away from regular players.
+- Command names are matched case-insensitively; a leading `/` is ignored.
+- `/gamemode` and `/g` are treated as the same command.
+- Everything is decided on the **server**; installing the mod on the client only adds the visual editor.
 
-Launch the game and enter a world or server
+## Links
 
-Press ESC to open the pause menu, click the "TP" button to enter the configuration interface
+- Project page: <https://www.curseforge.com/minecraft/mc-mods/authcmd>
+- Feedback (backup): <https://issue.mengcai.online/>
 
-Select the desired mode, configure the blacklist, and click "Save" to apply
+## License
 
-⚙️ Configuration Options
+MIT — author: Huziyang520
 
+---
+---
 
-Option	Description
-Non-OP players TP only	Enable Mode 1
-OP players block non-TP	Enable Mode 2 (includes game mode switcher block)
-Both enabled	Enable Mode 3
-Disable mod function	Disable all restrictions
-Show pause button	Whether to show the "TP" button in the pause menu
-Vanilla style texture	Switch to vanilla chest-style interface
-👥 Blacklist Management
+<a id="中文"></a>
 
-In the "Blacklist Management" section, enter a player name and click "+ Add" to add them to the blacklist. Blacklisted players are exempt from the current mode's restrictions. Click an entry to remove it.
+[English](#authcmd) | **中文**
 
-📖 功能介绍
+---
 
-OnlyTP 提供三种指令运行模式，帮助服务器管理员精确控制玩家的指令使用权限：
+# AuthCmd
 
-模式一：仅允许 TP
+> Minecraft 服务端的指令权限控制器：精确决定"哪个玩家能用哪些指令"。
 
-非 OP 玩家只能使用 /tp 和 /teleport 指令，其他指令会被自动拦截并提权执行。OP 玩家不受限制，可正常使用所有指令。
+## 它做什么
 
-模式二：禁止非 TP
+AuthCmd 给服主提供两套互相独立的规则，外加一个共用行为：
 
-OP 玩家只能使用 TP 类指令，使用其他指令会被拦截并提示。非 OP 玩家不受限制。同时禁止 OP 玩家使用 F3+F4 游戏模式切换器。
+| 规则 | 作用对象 | 含义 |
+|---|---|---|
+| **非OP 玩家指令白名单** | 普通玩家 | 名单里写的指令，**普通玩家也能使用**（这些指令原本只有OP能用）。名单外的指令保持原版行为不变。 |
+| **OP 玩家指令黑名单** | 管理员（OP） | 名单里写的指令，**管理员也不能使用**。名单外的指令照常可用。 |
+| **游戏模式切换** | 两者 | `/gamemode`、`/g` 与 F3+F4 游戏模式切换器，都跟随该玩家所处规则里的 `gamemode` 条目：名单里写了就能用，没写就别用。 |
 
-模式三：同时启用
+每套规则还各有**一份豁免名单**：在豁免名单里的玩家完全不受该规则约束。
 
-前两种规则叠加生效。非 OP 玩家只能使用 TP 指令，OP 玩家也只能使用 TP 指令。
+共 4 种模式：**全关闭**、**仅非OP白名单**、**仅OP黑名单**、**同时启用**。
 
-⚫ 黑名单系统
+## 快速开始
 
-每种模式均可独立配置黑名单。被加入黑名单的玩家完全不受该模式规则限制，可自由使用所有指令。
+1. 把模组文件放进服务端的 `mods` 文件夹（Fabric 或 NeoForge）。
+2. 启动一次服务端，会自动生成配置文件 `config/authcmd.toml`。
+3. 直接改这个文件，或者用游戏内编辑界面（见下）。
+4. 选好模式、填好指令名单与豁免名单，保存即可。
 
-🎨 双风格 GUI 配置界面
+## 游戏内编辑界面
 
-简约紫黑直角风格：深色背景，紫色边框，直角设计
+- 从**暂停菜单**的编辑按钮进入，或从**模组列表** → *AuthCmd* → *配置* 进入。
+- 可视化编辑界面需要客户端安装可选前置库 **AvalonBase**，并且在服务端拥有管理员权限；不装 AvalonBase 也能正常使用，只是只能手改配置文件。
+  - AvalonBase 下载：<https://www.curseforge.com/minecraft/mc-mods/avalonbase>
+- 如果服主关闭了编辑入口，模组列表入口仍会打开，但只显示一句"服务端关闭了编辑页面入口"的提示。
+- 界面的「界面设置」里有 **显示暂停按钮** 与 **启用动画效果** 两个开关（默认都开启）。
 
-原版箱子风格：仿原版 Minecraft 界面风格
+## 聊天提示
 
-局域网房主或服务器管理员可通过暂停菜单中的 "TP" 按钮或指令打开配置面板，所有修改即时同步至全体玩家。
+被拦截的指令会收到红字 `AuthCmd: 该指令已被禁止！`；被拦截的游戏模式切换则显示对应的游戏模式切换提示。
 
-🚀 使用方法
+## 配置文件
 
-将模组 jar 文件放入 mods 文件夹
+`config/authcmd.toml` —— 纯 TOML 文本，随时可以手改，**改动无需重启服务端**即可生效。
 
-启动游戏，进入世界或服务器
+| 键 | 含义 |
+|---|---|
+| `mode` | `disabled` / `non_op_only` / `op_only` / `both` |
+| `show_pause_button` | 是否显示暂停菜单里的编辑按钮 |
+| `enable_animations` | 是否启用界面开/关动画 |
+| `non_op_whitelist` / `op_blacklist` | 指令名单 |
+| `non_op_exempt` / `op_exempt` | 豁免玩家名单 |
 
-按 ESC 打开暂停菜单，点击 "TP" 按钮进入配置界面
+## 使用须知
 
-选择所需模式，配置黑名单，点击 "保存" 生效
+- 非OP 白名单**只做"额外放行"**，不会夺走普通玩家原本就能用的指令。
+- 指令名不区分大小写，开头的 `/` 会被忽略。
+- `/gamemode` 与 `/g` 视为同一条指令。
+- 所有判定都在**服务端**完成；客户端装本模组只是为了获得可视化编辑界面。
 
-⚙️ 配置选项
+## 相关链接
 
+- 项目主页：<https://www.curseforge.com/minecraft/mc-mods/authcmd>
+- 备用反馈地址：<https://issue.mengcai.online/>
 
-选项	说明
-非 OP 玩家仅允许 TP 指令	启用模式一
-OP 玩家禁止非 TP 指令	启用模式二（含禁止游戏模式切换器）
-同时启用	启用模式三
-关闭模组功能	禁用所有限制
-显示暂停按钮	是否在暂停菜单显示 "TP" 按钮
-原版风格纹理	切换为原版箱子风格界面
-👥 黑名单管理
+## 许可证
 
-在 "黑名单管理" 区域输入玩家名称，点击 "+ 添加" 将其加入黑名单。黑名单玩家不受当前模式规则限制。点击条目可删除。
+MIT —— 作者：Huziyang520
