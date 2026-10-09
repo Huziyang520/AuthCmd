@@ -56,8 +56,19 @@ public class AuthCmdConfig {
     /** 生效范围：disabled / non_op_only / op_only / both。 */
     public static String mode = MODE_DISABLED;
 
+    /**
+     * 非OP提权指令是否允许使用**目标选择器**（{@code @a} / {@code @p} / {@code @e} …）。
+     *
+     * <p>关闭时两侧同时生效：客户端不再把实体选择器权限视为已授予（照原样报错、不补全），
+     * 服务端对含 {@code @} 的提权指令直接拒绝并提示。
+     */
+    public static boolean allowEntitySelectors = true;
+
     /** 是否显示暂停页面可视化编辑按钮。 */
     public static boolean showPauseButton = true;
+
+    /** 界面是否播放开/关动画（AvalonBase 动画 API；默认开启）。客户端视觉项，随 SYNC 下发。 */
+    public static boolean enableAnimations = true;
 
     /** 客户端进入世界时若未装 AvalonBase，是否显示「安装AvalonBase启用可视化编辑」提示。0=关闭, 1=开启(默认)。 */
     public static int showTips = 1;
@@ -81,6 +92,20 @@ public class AuthCmdConfig {
 
     /** 热加载确认配置文件变更后，由平台入口注入的回调：向在线玩家重发命令树（config 层无服务端引用，用回调解耦）。 */
     private static volatile Runnable commandTreeResender;
+
+    /** 热加载确认配置文件变更后，由平台入口注入的回调：向在线玩家重播配置同步包。 */
+    private static volatile Runnable configBroadcaster;
+
+    /**
+     * 客户端是否已收到过服务端下发的配置同步。
+     *
+     * <p>用于区分"客户端已知配置 = 功能未生效"与"客户端根本还没拿到配置"两种情况：
+     * 未装 AvalonBase 时客户端不会注册网络接收器（{@code CommonClass.init} 直接返回），
+     * 也收不到配置同步；联机首帧同样存在时间窗。此时客户端不应按本地默认值（disabled / 空名单）
+     * 做否定判定，否则会出现"名单内命令可用、但 F3+F4 切换器打不开"的不一致。
+     * 该判定只由客户端侧调用方使用，服务端侧语义无影响。
+     */
+    private static volatile boolean clientConfigSynced = false;
 
     private AuthCmdConfig() {
     }
@@ -107,8 +132,12 @@ public class AuthCmdConfig {
 
     private static Config buildConfig() {
         Config cfg = Config.inMemory();
+        // 写盘顺序即文件里的顺序：模式与行为 → 界面 → 提示 → 名单子表
+        // （子表必须放在所有标量之后，否则 TOML 会把先写的标量并进子表）
         cfg.set("mode", mode);
+        cfg.set("allow_entity_selectors", allowEntitySelectors);
         cfg.set("show_pause_button", showPauseButton);
+        cfg.set("enable_animations", enableAnimations);
         cfg.set("show_tips", showTips);
         cfg.set("show_local_config_notice", showLocalConfigNotice);
         setSubList(cfg, "non_op_whitelist", nonOpWhitelist);
@@ -126,7 +155,9 @@ public class AuthCmdConfig {
             String text = Files.readString(CONFIG_PATH);
             Config cfg = new TomlParser().parse(text);
             mode = cfg.getOrElse("mode", MODE_DISABLED);
+            allowEntitySelectors = cfg.getOrElse("allow_entity_selectors", true);
             showPauseButton = cfg.getOrElse("show_pause_button", true);
+            enableAnimations = cfg.getOrElse("enable_animations", true);
             showTips = cfg.getOrElse("show_tips", 1);
             showLocalConfigNotice = cfg.getOrElse("show_local_config_notice", 1);
             nonOpWhitelist = new ArrayList<>(getSubList(cfg, "non_op_whitelist"));
@@ -190,6 +221,10 @@ public class AuthCmdConfig {
             if (commandTreeResender != null) {
                 commandTreeResender.run();
             }
+            // 手改 TOML 时命令树重发只覆盖补全；show_pause_button 等非命令类字段需要重播配置包才对已在线客户端生效
+            if (configBroadcaster != null) {
+                configBroadcaster.run();
+            }
         } catch (Exception e) {
             LOGGER.error("Failed to hot-reload config", e);
         }
@@ -202,6 +237,24 @@ public class AuthCmdConfig {
      */
     public static void setCommandTreeResender(Runnable resender) {
         commandTreeResender = resender;
+    }
+
+    /**
+     * 注入配置重播回调。仅服务端入口在服务器启动后调用一次；
+     * 手改 TOML 触发热加载时向在线玩家重播 SYNC 包，使 {@code show_pause_button} 等非命令类开关也即时生效。
+     */
+    public static void setConfigBroadcaster(Runnable broadcaster) {
+        configBroadcaster = broadcaster;
+    }
+
+    /** 客户端收到服务端配置同步后置位（仅客户端侧语义）。 */
+    public static void markClientConfigSynced() {
+        clientConfigSynced = true;
+    }
+
+    /** 客户端是否已收到过服务端配置同步。 */
+    public static boolean isClientConfigSynced() {
+        return clientConfigSynced;
     }
 
     private static List<String> getSubList(Config cfg, String section) {
@@ -218,7 +271,9 @@ public class AuthCmdConfig {
 
     private static void resetDefaults() {
         mode = MODE_DISABLED;
+        allowEntitySelectors = true;
         showPauseButton = true;
+        enableAnimations = true;
         showTips = 1;
         showLocalConfigNotice = 1;
         nonOpWhitelist = new ArrayList<>();

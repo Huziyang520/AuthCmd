@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
  * {@code handleDebugKeys} 中打开切换器分支改为：
  * {@code if (... && GameModeCommand.PERMISSION_CHECK.check(player.permissions())) ... new GameModeSwitcherScreen()}
  * 此处将打开切换器分支那一次 {@code PERMISSION_CHECK.check(...)} 判定改为：在
- * {@link GameModeLogic#shouldAllowGameModeChange} 放行时返回 true，从而允许非OP打开切换器；
+ * {@link GameModeLogic#shouldAllowGameModeSwitcher} 放行时返回 true，从而允许非OP打开切换器；
  * 选好模式后的切换包由 {@link GameModeSwitcherScreenMixin} 放行，服务端由
  * {@link ServerGamePacketListenerImplMixin} 放行 + {@code GameModeLogic.shouldBlock} 统一把关。
  */
@@ -30,7 +30,7 @@ public class KeyboardHandlerMixin {
                     ordinal = 1))
     private static boolean authcmd$allowGameModeSwitcher(PermissionCheck check, PermissionSet set) {
         LocalPlayer player = Minecraft.getInstance().player;
-        if (player != null && GameModeLogic.shouldAllowGameModeChange(player)) return true;
+        if (player != null && GameModeLogic.shouldAllowGameModeSwitcher(player)) return true;
         return check.check(set);
     }
 }
