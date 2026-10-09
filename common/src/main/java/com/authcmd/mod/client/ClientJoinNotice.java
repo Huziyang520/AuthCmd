@@ -38,9 +38,7 @@ public class ClientJoinNotice {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
         mc.player.displayClientMessage(
-                Component.translatable("message.authcmd.avalon_missing"),
-                false // false = 走聊天框，不进动作栏
-        );
+                Component.translatable("message.authcmd.avalon_missing"), false);
     }
 
     /**

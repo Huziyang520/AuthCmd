@@ -11,10 +11,10 @@ import org.spongepowered.asm.mixin.injection.Redirect;
  * Fabric 客户端：功能一启用且 {@code gamemode} 命中白名单时，允许非OP打开 F3+F4 游戏模式切换器。
  *
  * <p>原版 {@code KeyboardHandler.handleDebugKeys} 仅在 {@code player.hasPermissions(2)}（OP）时
- * 打开 {@code GameModeSwitcherScreen}，非OP（非创造）直接被拦并提示「无权使用游戏模式切换器」。
+ * 打开 {@code GameModeSwitcherScreen}，非OP直接被拦并提示「无权使用游戏模式切换器」。
  * 此处将 handleDebugKeys 中打开切换器分支那一次 {@code hasPermissions(2)} 判定改为：在
- * {@link GameModeLogic#shouldAllowGameModeChange} 放行时返回 true，从而允许非OP打开切换器；
- * 选好模式后的切换命令由 {@link GameModeSwitcherScreenMixin} 放行（1.20.1 切换器执行
+ * {@link GameModeLogic#shouldAllowGameModeSwitcher} 放行时返回 true，从而允许非OP打开切换器；
+ * 选好模式后的切换命令由 {@link GameModeSwitcherScreenMixin} 放行（1.21.8 切换器执行
  * {@code /gamemode} 命令而非发包），最终由 {@code CommandLogic} 提权 + {@code GameModeLogic.shouldBlock} 统一把关。
  */
 @Mixin(KeyboardHandler.class)

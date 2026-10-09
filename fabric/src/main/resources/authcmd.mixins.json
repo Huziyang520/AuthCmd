@@ -6,9 +6,11 @@
     "mixins": [
         "CommandsMixin",
         "ScreenAccessor",
-        "ServerPlayerMixin"
+        "ServerPlayerMixin",
+        "ServerGamePacketListenerImplMixin"
     ],
     "client": [
+        "ClientSuggestionProviderMixin",
         "GameModeSwitcherScreenMixin",
         "KeyboardHandlerMixin"
     ],

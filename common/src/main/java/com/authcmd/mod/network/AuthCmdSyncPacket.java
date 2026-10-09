@@ -11,10 +11,10 @@ import java.util.List;
  */
 public class AuthCmdSyncPacket extends AuthCmdConfigPacket {
 
-    public AuthCmdSyncPacket(String mode, boolean showPauseButton,
+    public AuthCmdSyncPacket(String mode, boolean allowEntitySelectors, boolean showPauseButton, boolean enableAnimations,
                              List<String> nonOpWhitelist, List<String> opBlacklist,
                              List<String> nonOpExempt, List<String> opExempt) {
-        super(mode, showPauseButton, nonOpWhitelist, opBlacklist, nonOpExempt, opExempt);
+        super(mode, allowEntitySelectors, showPauseButton, enableAnimations, nonOpWhitelist, opBlacklist, nonOpExempt, opExempt);
     }
 
     public AuthCmdSyncPacket(FriendlyByteBuf buf) {
@@ -24,5 +24,7 @@ public class AuthCmdSyncPacket extends AuthCmdConfigPacket {
     /** 客户端收到后应用配置。 */
     public void applyToClient() {
         applyToConfig();
+        // 标记客户端已拿到服务端配置：客户端侧入口判定（F3+F4 切换器）此后按真实配置判定
+        com.authcmd.mod.config.AuthCmdConfig.markClientConfigSynced();
     }
 }
