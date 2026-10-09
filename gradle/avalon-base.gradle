@@ -15,7 +15,7 @@
 // 之所以不用 fileTree 直接指路：fileTree 对不存在的目录返回空集且不报错，
 // 依赖会静默消失，最终以「找不到 com.avalon.* 包」的形式暴露，排查成本很高。
 ext.resolveAvalonJar = { String loader ->
-    String mc = project.property('minecraft_version')
+    String mc = project.property('mc_range_label')
 
     // 优先级 1：显式指定文件（-Pavalon_fabric_jar=... / -Pavalon_forge_jar=... / 通用 -Pavalon_jar=...）
     def explicit = project.findProperty("avalon_${loader}_jar") ?: project.findProperty('avalon_jar')
