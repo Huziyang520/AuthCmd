@@ -2,19 +2,12 @@ plugins {
     id 'multiloader-common'
     id 'net.neoforged.moddev'
 }
-
-apply from: "${rootDir}/gradle/avalon-base.gradle"
-
 neoForge {
     neoFormVersion = neo_form_version
     // Automatically enable AccessTransformers if the file exists
     def at = file('src/main/resources/META-INF/accesstransformer.cfg')
     if (at.exists()) {
         accessTransformers.from(at.absolutePath)
-    }
-    parchment {
-        minecraftVersion = parchment_minecraft
-        mappingsVersion = parchment_version
     }
 }
 
@@ -27,9 +20,13 @@ dependencies {
 
     // AvalonBase 前置支持库（网络 / GUI 主题 / 配置框架）：仅编译期需要，
     // 运行时由用户自行安装（未安装时 AvalonLink.isAvalonLoaded() 返回 false，相关代码路径跳过）。
-    // jar 定位逻辑见 gradle/avalon-base.gradle。
-    // 注：common 为 NeoForge moddev 模块，无 loom，只能用普通 compileOnly。
-    compileOnly(files(resolveAvalonJar('fabric')))
+    // 固定文件名：build/libs 永久保留各旧版 jar（铁律不删），通配会把多个版本同时放进 classpath；
+    // AvalonBase 升版时必须同步修改此处文件名。
+    // 注：common 为 NeoForge moddev 模块，无 loom，只能用普通 compileOnly；
+    // named 映射：loom 的 build/libs 是 intermediary 产物，common 为 moddev（official）编译，只能用 devlibs 的 dev jar。
+    compileOnly fileTree(project.file("../../../AvalonBase/1.21.2-1.21.5/fabric/build/devlibs")) {
+        include "avalonbase-fabric-1.21.5-1.5.1-dev.jar"
+    }
 }
 
 configurations {

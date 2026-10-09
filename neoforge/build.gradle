@@ -2,9 +2,6 @@ plugins {
     id 'multiloader-loader'
     id 'net.neoforged.moddev'
 }
-
-apply from: "${rootDir}/gradle/avalon-base.gradle"
-
 base {
     archivesName = "${mod_name}-neoforge-${minecraft_version}"
 }
@@ -14,11 +11,6 @@ neoForge {
 
     // Automated decoration of Dependencies for Dev/Prod builds, and ModMaven publishing
     addModdingDependenciesTo(sourceSets.main)
-
-    parchment {
-        minecraftVersion = parchment_minecraft
-        mappingsVersion = parchment_version
-    }
 
     runs {
         client {
@@ -33,8 +25,12 @@ neoForge {
 
 dependencies {
     // AvalonBase 前置支持库：仅编译期需要（运行时由 neoforge.mods.toml 声明可选前置）。
-    // 编译期来源与 forge 子项目一致（common 源码经由 multiloader-loader 注入，需各自声明引用）。
-    compileOnly(files(resolveAvalonJar('neoforge')))
+    // 编译期来源与 fabric 子项目一致（common 源码经由 multiloader-loader 注入，需各自声明引用）。
+    // 固定文件名：build/libs 永久保留各旧版 jar（铁律不删），通配会把多个版本同时放进 classpath；
+    // AvalonBase 升版时必须同步修改此处文件名。
+    compileOnly fileTree(project.file("../../../AvalonBase/1.21.2-1.21.5/neoforge/build/libs")) {
+        include "AvalonBase-neoforge-1.21.5-1.5.1.jar"
+    }
     compileOnly project(":common")
 
     // nightconfig（TOML）：NeoForge 运行时自带，编译期显式声明以解析 common 的引用
