@@ -1,8 +1,8 @@
 package com.authcmd.mod.event;
 
 import com.authcmd.mod.config.AuthCmdConfig;
+import com.authcmd.mod.util.ModMsg;
 import com.mojang.logging.LogUtils;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.entity.player.Player;
@@ -41,7 +41,7 @@ public class GameModeLogic {
         boolean allowed = AuthCmdConfig.isGamemodeAllowed(domain);
         LOGGER.info("[AuthCmd] shouldBlock gamemodeAllowed={}", allowed);
         if (!allowed) {
-            player.displayClientMessage(Component.translatable("message.authcmd.blocked_gamemode"), true);
+            player.displayClientMessage(ModMsg.red(player, "message.authcmd.blocked_gamemode"), false);
             return true;
         }
         return false;
@@ -78,18 +78,40 @@ public class GameModeLogic {
     }
 
     /**
+     * 客户端 F3+F4 切换器入口/发包的放行判定（<b>严格</b>，2026-10-07 口径修正）。
+     *
+     * <p>口径：<b>只有</b>「功能一（非OP白名单）生效 + 名单里写入了 {@code gamemode}/{@code g}
+     * + 该玩家未被豁免」时才放行入口；否则一律返回 {@code false}，让原版走自己的拒绝分支——
+     * {@code KeyboardHandler.handleDebugKeys} 会打出 {@code debug.gamemodes.error}
+     *（中文即「[调试]：你没有权限打开游戏模式切换器」）并且<b>不打开</b>切换器界面，
+     * 表现与未启用本模组时完全一致。
+     *
+     * <p><b>为什么不再宽松</b>：旧实现（2026-10-01）只判「功能一是否生效」，理由是想绕开
+     * 「未装 AvalonBase 的客户端收不到 SYNC ⇒ 本地名单恒空 ⇒ 界面打不开」的不一致；代价是
+     * <b>名单里没写 {@code gamemode} 时非OP 依然能看到切换器</b>，与「名单决定是否可用」的语义相反。
+     * 现在改为严格判定：客户端名单为空（含尚未收到 SYNC 的联机首帧）⇒ 打不开，需等服务端
+     * 下发配置；真正的把关仍由服务端 {@link #shouldBlock} / {@link #shouldAllowGameModeChange} 承担，
+     * 客户端放行不会造成越权（服务端未放行时切换仍会被回滚）。
+     *
+     * @param player 客户端本地玩家（{@code LocalPlayer}，以 {@link Player} 形参传入以避免 common 侧引用客户端类）
+     * @return true 表示应绕过原版权限检查，放行切换器打开/切换
+     */
+    public static boolean shouldAllowGameModeSwitcher(Player player) {
+        return shouldAllowGameModeChange(player);
+    }
+
+    /**
      * 客户端 F3+F4 切换器两处 {@code LocalPlayer.hasPermissions(int)} 的通用放行判定。
      *
-     * <p>{@link KeyboardHandlerMixin}（打开界面）与 {@code GameModeSwitcherScreenMixin}
-     * （发送切换命令）共用此逻辑，避免复制。非OP在功能一启用且 {@code gamemode} 命中白名单
-     * （或豁免）时返回 true；OP 及其他情形交还原版 {@code player.hasPermissions(permissionLevel)}。
+     * <p>1.20.1 等旧版本的切换器走 {@code hasPermissions(int)}；26.3 已改为直接判定
+     * {@code PermissionCheck}，由 {@link #shouldAllowGameModeSwitcher} 承担。
      *
      * @param player          客户端本地玩家
      * @param permissionLevel 原版权限检查要求的权限等级
      * @return true 表示放行（绕过原版权限判定）
      */
     public static boolean allowHasPermissions(Player player, int permissionLevel) {
-        if (shouldAllowGameModeChange(player)) return true;
+        if (shouldAllowGameModeSwitcher(player)) return true;
         return player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER);
     }
 }

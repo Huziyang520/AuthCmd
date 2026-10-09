@@ -11,7 +11,8 @@
     ],
     "client": [
         "GameModeSwitcherScreenMixin",
-        "KeyboardHandlerMixin"
+        "KeyboardHandlerMixin",
+        "ClientSuggestionProviderMixin"
     ],
     "injectors": {
         "defaultRequire": 1

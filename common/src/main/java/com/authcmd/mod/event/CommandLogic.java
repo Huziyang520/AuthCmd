@@ -1,6 +1,7 @@
 package com.authcmd.mod.event;
 
 import com.authcmd.mod.config.AuthCmdConfig;
+import com.authcmd.mod.util.ModMsg;
 import com.mojang.brigadier.ParseResults;
 import com.mojang.logging.LogUtils;
 import net.minecraft.commands.CommandSourceStack;
@@ -63,6 +64,7 @@ public class CommandLogic {
         // 白名单外的指令不做任何干预，交还原版——非OP原本能用的照常用，原本不能用的由原版拦截。
         if (domain == 1) {
             if (AuthCmdConfig.isAllowed(domain, cmd)) {
+                if (deniesEntitySelector(raw, player)) return true;
                 executeElevated(player, raw);
                 return true;
             }
@@ -73,7 +75,7 @@ public class CommandLogic {
         // 两个别名整体判定，与游戏模式切换器（GameModeLogic）保持一致
         if ("gamemode".equals(cmd) || "g".equals(cmd)) {
             if (!AuthCmdConfig.isGamemodeAllowed(domain)) {
-                player.displayClientMessage(Component.translatable("message.authcmd.blocked_gamemode"), false);
+                player.displayClientMessage(ModMsg.red(player, "message.authcmd.blocked_gamemode"), false);
                 return true;
             }
             return false;
@@ -81,10 +83,25 @@ public class CommandLogic {
 
         // 功能二：命中黑名单 → 拦截
         if (AuthCmdConfig.shouldBlockCommand(domain, cmd)) {
-            player.displayClientMessage(Component.translatable("message.authcmd.blocked"), false);
+            player.displayClientMessage(ModMsg.red(player, "message.authcmd.blocked"), false);
             return true;
         }
         return false;
+    }
+
+    /**
+     * 目标选择器开关关闭时，拒绝**含选择器**的提权指令。
+     *
+     * <p>只关客户端是不够的：服务端是"用全权限源提权执行"，选择器天然不受限。因此在提权之前
+     * 再拦一次，保证"关闭 = 真的不能用"。
+     *
+     * @return true 表示已拦截（并已提示玩家）
+     */
+    private static boolean deniesEntitySelector(String raw, ServerPlayer player) {
+        if (AuthCmdConfig.allowEntitySelectors) return false;
+        if (raw == null || raw.indexOf('@') < 0) return false;
+        player.displayClientMessage(ModMsg.red(player, "message.authcmd.selector_blocked"), false);
+        return true;
     }
 
     /**

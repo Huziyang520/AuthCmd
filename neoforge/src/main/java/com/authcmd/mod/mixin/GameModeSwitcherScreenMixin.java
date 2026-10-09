@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
  * {@code GameModeSwitcherScreen.switchToHoveredGameMode} 不再发送 {@code /gamemode} 命令，
  * 而是直接发送 {@code ServerboundChangeGameModePacket}：
  * {@code if (GameModeCommand.PERMISSION_CHECK.check(player.permissions())) send(new ServerboundChangeGameModePacket(...))}
- * 此处将本次 {@code PERMISSION_CHECK.check(...)} 判定改为：在 {@link GameModeLogic#shouldAllowGameModeChange}
+ * 此处将本次 {@code PERMISSION_CHECK.check(...)} 判定改为：在 {@link GameModeLogic#shouldAllowGameModeSwitcher}
  * 放行时返回 true，从而让非OP真正发包；
  * 包到服务端后由 {@link ServerGamePacketListenerImplMixin} 放行 + {@code GameModeLogic.shouldBlock} 统一把关。
  */
@@ -29,7 +29,7 @@ public class GameModeSwitcherScreenMixin {
                     target = "Lnet/minecraft/server/permissions/PermissionCheck;check(Lnet/minecraft/server/permissions/PermissionSet;)Z"))
     private static boolean authcmd$allowSwitchGameMode(PermissionCheck check, PermissionSet set) {
         LocalPlayer player = Minecraft.getInstance().player;
-        if (player != null && GameModeLogic.shouldAllowGameModeChange(player)) return true;
+        if (player != null && GameModeLogic.shouldAllowGameModeSwitcher(player)) return true;
         return check.check(set);
     }
 }

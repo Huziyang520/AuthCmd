@@ -3,11 +3,12 @@
     "id": "authcmd",
     "version": "${version}",
     "name": "${mod_name}",
-    "description": "${description}",
+    "description": "[EN] Restrict which commands players can execute and which game modes they can switch to, based on configurable permission lists.\n[CN] 基于可配置的权限名单，限制玩家可执行的指令，以及可切换的游戏模式。",
     "authors": [
         "${mod_author}"
     ],
     "contact": {
+        "homepage": "https://www.curseforge.com/minecraft/mc-mods/authcmd",
         "issues": "https://github.com/Huziyang520/AuthCmd/issues"
     },
     "license": "${license}",
@@ -19,6 +20,9 @@
         ],
         "client": [
             "com.authcmd.mod.client.AuthCmdClient"
+        ],
+        "modmenu": [
+            "com.authcmd.mod.client.ModMenuConfigEntry"
         ]
     },
     "mixins": [
@@ -34,9 +38,13 @@
         "avalonbase": ">=1.0.0"
     },
     "custom": {
+        "catalogue": {
+            "configFactory": "com.authcmd.mod.client.CatalogueConfigEntry"
+        },
         "modmenu": {
-            "hidden": true,
-            "badges": []
+            "links": {
+                "authcmd.feedback": "https://issue.mengcai.online/"
+            }
         }
     }
 }

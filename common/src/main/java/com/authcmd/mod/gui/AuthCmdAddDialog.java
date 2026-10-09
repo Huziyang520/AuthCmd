@@ -1,8 +1,12 @@
 package com.authcmd.mod.gui;
 
+import com.avalon.base.gui.anim.ScreenAnim;
+import com.avalon.base.gui.anim.ScreenAnimType;
 import com.avalon.base.gui.theme.GuiTheme;
 import com.avalon.base.gui.theme.ModernTheme;
 import com.avalon.base.gui.theme.ThemedButton;
+import com.authcmd.mod.config.AuthCmdConfig;
+import com.authcmd.mod.util.ModMsg;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
@@ -12,7 +16,7 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.cursor.CursorTypes;
 
 import java.util.List;
 
@@ -38,8 +42,9 @@ public class AuthCmdAddDialog extends Screen {
     private ThemedButton addButton;
     private ThemedButton doneButton;
 
-    private long handCursor;
-    private long arrowCursor;
+    /** 二级弹窗的开/关动画（与主编辑界面同一类型）；「启用动画效果」关闭时完全无动画。 */
+    private final ScreenAnim anim;
+    private boolean closeDone;
 
     public AuthCmdAddDialog(Screen parent, boolean command, List<String> targetList) {
         super(Component.translatable(command
@@ -48,13 +53,14 @@ public class AuthCmdAddDialog extends Screen {
         this.command = command;
         this.targetList = targetList;
         this.theme = new ModernTheme();
+        this.anim = AuthCmdConfig.enableAnimations
+                ? new ScreenAnim(ScreenAnimType.SCALE_BOUNCE, ScreenAnimType.SCALE_BOUNCE)
+                : ScreenAnim.disabled();
+        this.anim.playOpen();
     }
 
     @Override
     protected void init() {
-        handCursor = GLFW.glfwCreateStandardCursor(GLFW.GLFW_HAND_CURSOR);
-        arrowCursor = GLFW.glfwCreateStandardCursor(GLFW.GLFW_ARROW_CURSOR);
-
         int x = (width - DIALOG_W) / 2;
         int y = (height - DIALOG_H) / 2;
 
@@ -110,7 +116,7 @@ public class AuthCmdAddDialog extends Screen {
 
     private void playerMessage(String key) {
         if (minecraft != null && minecraft.player != null)
-            minecraft.player.displayClientMessage(Component.translatable(key), false);
+            minecraft.player.displayClientMessage(ModMsg.red(minecraft.player, key), false);
     }
 
     private void playClick() {
@@ -120,12 +126,17 @@ public class AuthCmdAddDialog extends Screen {
 
     @Override
     public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        // no-op：抑制 1.21.1 四参背景。该背景在 super.render 内会被再次调用，否则会模糊已自绘内容。
+        // 背景通道交给原版（主菜单 = 全景图 + 模糊 + 菜单背景贴图；世界内 = 模糊 + 半透明暗底）。
+        // 它同样位于动画变换之外，动画期间整屏始终是暗的，不会出现"弹窗变小、四周露出一圈更亮"的分层。
+        super.renderBackground(g, mouseX, mouseY, partialTick);
     }
 
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        g.fill(0, 0, this.width, this.height, 0x55000000);
+        // 动画：命中测试用动画坐标系，位姿变换只作用于弹窗本体
+        mouseX = (int) anim.localX(mouseX, width);
+        mouseY = (int) anim.localY(mouseY, height);
+        anim.beginFrame(g, width, height);
         int x = (width - DIALOG_W) / 2;
         int y = (height - DIALOG_H) / 2;
         theme.drawPanel(g, x, y, DIALOG_W, DIALOG_H);
@@ -134,19 +145,31 @@ public class AuthCmdAddDialog extends Screen {
                 x + 14, y + 12, theme.labelColor(), false);
         super.render(g, mouseX, mouseY, partialTick);
 
+        // Same one-pixel right-angle button frames as the editor screen.
+        if (theme instanceof ModernTheme modern) {
+            ButtonFrames.render(g, this, modern.palette());
+        }
+
         // ─── 光标：仅当鼠标真正悬停在按钮或输入框上才显示手形 ───
         // 注意不能用 isHoveredOrFocused()：输入框始终处于聚焦状态（setFocused(true)），
-        // isFocused 恒为 true 会导致手形永不消失。这里一律改用“鼠标是否悬停”判断。
+        // isFocused 恒为 true 会导致手形永不消失。这里一律改用"鼠标是否悬停"判断。
         boolean showHand = false;
         if (addButton.isHovered() && addButton.active) showHand = true;
         if (!showHand && doneButton.isHovered()) showHand = true;
         if (!showHand && input.isMouseOver(mouseX, mouseY)) showHand = true;
-        setCursor(showHand);
+        setCursor(g, showHand);
+
+        anim.endFrame(g, width, height);
+        if (anim.isCloseFinished()) backToParent();
     }
 
-    private void setCursor(boolean showHand) {
-        long window = Minecraft.getInstance().getWindow().handle();
-        GLFW.glfwSetCursor(window, showHand ? handCursor : arrowCursor);
+    /**
+     * 26.3 光标走 {@code GuiGraphics.requestCursor(...)}（帧末统一 apply 到窗口），
+     * 直接调 {@code Window.selectCursor} 会在帧末被覆盖。仅在需要手形时请求，不要请求箭头，
+     * 否则会盖掉输入框等原版控件自己请求的光标。
+     */
+    private void setCursor(GuiGraphics g, boolean showHand) {
+        if (showHand) g.requestCursor(CursorTypes.POINTING_HAND);
     }
 
     @Override
@@ -162,19 +185,31 @@ public class AuthCmdAddDialog extends Screen {
 
     @Override
     public boolean keyPressed(KeyEvent event) {
-        int keyCode = event.key();
-        if (keyCode == 257 || keyCode == 335) { // Enter / Numpad Enter
+        if (event.isConfirmation()) { // Enter / Numpad Enter (26.3 SDL scancodes)
             addEntry();
             return true;
         }
         return super.keyPressed(event);
     }
 
+    /** 真正切回父界面（有关闭动画时由动画播完后调用；幂等）。 */
+    private void backToParent() {
+        if (closeDone) return;
+        closeDone = true;
+        minecraft.setScreenAndShow(parent);
+    }
+
     @Override
     public void onClose() {
-        if (handCursor != 0) GLFW.glfwDestroyCursor(handCursor);
-        if (arrowCursor != 0) GLFW.glfwDestroyCursor(arrowCursor);
-        minecraft.setScreen(parent);
+        // 有关闭动画 → 先播动画，播完再回父界面
+        if (anim.beginClose()) return;
+        backToParent();
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (anim.isCloseFinished()) backToParent();
     }
 
     @Override

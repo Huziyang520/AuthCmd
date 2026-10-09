@@ -18,7 +18,8 @@ public class PlayerJoinLogic {
 
     public static void onPlayerJoin(ServerPlayer player) {
         if (!AvalonLink.isAvalonLoaded()) return;
-        Object sync = new AuthCmdSyncPacket(AuthCmdConfig.mode, AuthCmdConfig.showPauseButton,
+        Object sync = new AuthCmdSyncPacket(AuthCmdConfig.mode, AuthCmdConfig.allowEntitySelectors, AuthCmdConfig.showPauseButton,
+                AuthCmdConfig.enableAnimations,
                 AuthCmdConfig.nonOpWhitelist, AuthCmdConfig.opBlacklist,
                 AuthCmdConfig.nonOpExempt, AuthCmdConfig.opExempt);
         AvalonNetworkBridge.sendToPlayer(player, NetworkChannels.SYNC, sync);

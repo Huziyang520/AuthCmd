@@ -17,17 +17,21 @@ import java.util.List;
 public abstract class AuthCmdConfigPacket {
 
     protected final String mode;
+    protected final boolean allowEntitySelectors;
     protected final boolean showPauseButton;
+    protected final boolean enableAnimations;
     protected final List<String> nonOpWhitelist;
     protected final List<String> opBlacklist;
     protected final List<String> nonOpExempt;
     protected final List<String> opExempt;
 
-    protected AuthCmdConfigPacket(String mode, boolean showPauseButton,
+    protected AuthCmdConfigPacket(String mode, boolean allowEntitySelectors, boolean showPauseButton, boolean enableAnimations,
                                   List<String> nonOpWhitelist, List<String> opBlacklist,
                                   List<String> nonOpExempt, List<String> opExempt) {
         this.mode = mode;
+        this.allowEntitySelectors = allowEntitySelectors;
         this.showPauseButton = showPauseButton;
+        this.enableAnimations = enableAnimations;
         this.nonOpWhitelist = new ArrayList<>(nonOpWhitelist);
         this.opBlacklist = new ArrayList<>(opBlacklist);
         this.nonOpExempt = new ArrayList<>(nonOpExempt);
@@ -36,7 +40,9 @@ public abstract class AuthCmdConfigPacket {
 
     protected AuthCmdConfigPacket(FriendlyByteBuf buf) {
         this.mode = buf.readUtf();
+        this.allowEntitySelectors = buf.readBoolean();
         this.showPauseButton = buf.readBoolean();
+        this.enableAnimations = buf.readBoolean();
         this.nonOpWhitelist = readList(buf);
         this.opBlacklist = readList(buf);
         this.nonOpExempt = readList(buf);
@@ -45,7 +51,9 @@ public abstract class AuthCmdConfigPacket {
 
     public void encode(FriendlyByteBuf buf) {
         buf.writeUtf(mode);
+        buf.writeBoolean(allowEntitySelectors);
         buf.writeBoolean(showPauseButton);
+        buf.writeBoolean(enableAnimations);
         writeList(buf, nonOpWhitelist);
         writeList(buf, opBlacklist);
         writeList(buf, nonOpExempt);
@@ -55,7 +63,9 @@ public abstract class AuthCmdConfigPacket {
     /** 将本包携带的配置写入 {@link AuthCmdConfig} 内存字段。 */
     protected void applyToConfig() {
         AuthCmdConfig.mode = this.mode;
+        AuthCmdConfig.allowEntitySelectors = this.allowEntitySelectors;
         AuthCmdConfig.showPauseButton = this.showPauseButton;
+        AuthCmdConfig.enableAnimations = this.enableAnimations;
         AuthCmdConfig.nonOpWhitelist = new ArrayList<>(this.nonOpWhitelist);
         AuthCmdConfig.opBlacklist = new ArrayList<>(this.opBlacklist);
         AuthCmdConfig.nonOpExempt = new ArrayList<>(this.nonOpExempt);

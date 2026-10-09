@@ -1,9 +1,9 @@
 package com.authcmd.mod.network;
 
 import com.authcmd.mod.Constants;
-import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.resources.Identifier;
 
 /**
  * AvalonNetwork 反射桥。

@@ -15,10 +15,10 @@ import java.util.List;
  */
 public class AuthCmdUpdatePacket extends AuthCmdConfigPacket {
 
-    public AuthCmdUpdatePacket(String mode, boolean showPauseButton,
+    public AuthCmdUpdatePacket(String mode, boolean allowEntitySelectors, boolean showPauseButton, boolean enableAnimations,
                                List<String> nonOpWhitelist, List<String> opBlacklist,
                                List<String> nonOpExempt, List<String> opExempt) {
-        super(mode, showPauseButton, nonOpWhitelist, opBlacklist, nonOpExempt, opExempt);
+        super(mode, allowEntitySelectors, showPauseButton, enableAnimations, nonOpWhitelist, opBlacklist, nonOpExempt, opExempt);
     }
 
     public AuthCmdUpdatePacket(FriendlyByteBuf buf) {
@@ -40,7 +40,8 @@ public class AuthCmdUpdatePacket extends AuthCmdConfigPacket {
         if (server == null) return;
 
         if (AvalonLink.isAvalonLoaded()) {
-            var sync = new AuthCmdSyncPacket(AuthCmdConfig.mode, AuthCmdConfig.showPauseButton,
+            var sync = new AuthCmdSyncPacket(AuthCmdConfig.mode, AuthCmdConfig.allowEntitySelectors,
+                    AuthCmdConfig.showPauseButton, AuthCmdConfig.enableAnimations,
                     AuthCmdConfig.nonOpWhitelist, AuthCmdConfig.opBlacklist,
                     AuthCmdConfig.nonOpExempt, AuthCmdConfig.opExempt);
             AvalonNetworkBridge.sendToAll(server, NetworkChannels.SYNC, sync);
