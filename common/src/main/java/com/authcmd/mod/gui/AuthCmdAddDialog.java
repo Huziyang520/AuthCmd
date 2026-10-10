@@ -124,6 +124,13 @@ public class AuthCmdAddDialog extends Screen {
 
     @Override
     public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        // 防闪（SKILL.md §10.28）：退场动画播完的那一帧，本屏不再绘制自己的背景，
+        // 并在背景阶段就交回父界面——否则本屏背景与父界面背景会叠在同一帧，看到一次跳变。
+        anim.tick();
+        if (anim.isClosing() && anim.isCloseFinished()) {
+            backToParent(); // 与本次 return 成对：不可只留一半
+            return;
+        }
         // 背景通道交给原版（主菜单 = 全景图 + 模糊 + 菜单背景贴图；世界内 = 模糊 + 半透明暗底）。
         // 它同样位于动画变换之外，动画期间整屏始终是暗的，不会出现"弹窗变小、四周露出一圈更亮"的分层。
         super.renderBackground(g, mouseX, mouseY, partialTick);
@@ -158,7 +165,7 @@ public class AuthCmdAddDialog extends Screen {
         setCursor(g, showHand);
 
         anim.endFrame(g, width, height);
-        if (anim.isCloseFinished()) backToParent();
+        // 防闪（SKILL.md §10.28）：切父界面的动作已挪到背景方法的提前 return 分支，这里不再切屏
     }
 
     /**
@@ -205,6 +212,7 @@ public class AuthCmdAddDialog extends Screen {
     @Override
     public void tick() {
         super.tick();
+        anim.tick();
         if (anim.isCloseFinished()) backToParent();
     }
 
