@@ -1,14 +1,18 @@
 modLoader = "javafml"
 loaderVersion = "${neoforge_loader_version_range}"
 license = "${license}"
-issueTrackerURL = "https://github.com/Huziyang520/AuthCmd/issues"
 [[mods]]
 modId = "${mod_id}"
 version = "${version}"
 displayName = "${mod_name}"
+displayURL = "https://www.curseforge.com/minecraft/mc-mods/authcmd"
+issueTrackerURL = "https://github.com/Huziyang520/AuthCmd/issues"
 logoFile = "assets/authcmd/textures/authcmd.png"
 authors = "${mod_author}"
-description = '''${description}'''
+description = '''
+[EN] Restrict which commands players can execute and which game modes they can switch to, based on configurable permission lists.
+[CN] 基于可配置的权限名单，限制玩家可执行的指令，以及可切换的游戏模式。
+'''
 [[mixins]]
 config = "authcmd.mixins.json"
 [[dependencies.${mod_id}]]

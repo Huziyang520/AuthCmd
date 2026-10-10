@@ -25,6 +25,10 @@ dependencies {
     modCompileOnly(avalonJar)
     modLocalRuntime(avalonJar)
 
+    // ModMenu 仅编译期需要：modCompileOnly 会被 remap 成 named，且永不打进产物 jar。
+    // 版本沿用 1.21-1.21.8 档已缓存的那份（ModMenuApi 长期稳定，编译期只需要 API 形状）。
+    modCompileOnly "com.terraformersmc:modmenu:15.0.2"
+
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
     // nightconfig（TOML）：Fabric 不自带，需打包进模组（common 与 AvalonBase 均依赖）
     include implementation("com.electronwill.night-config:core:3.6.4")
