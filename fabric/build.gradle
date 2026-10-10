@@ -26,6 +26,11 @@ dependencies {
     modLocalRuntime(avalonJar)
 
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
+    // Mod Menu API: compile-time only so the mod list can show our config button.
+    // 本档 loom 为经典模式（mod* 配置可用）：modCompileOnly 会把它 remap 成 named，
+    // 且永远不会打进产物 jar。
+    modCompileOnly "com.terraformersmc:modmenu:15.0.2"
+
     // nightconfig（TOML）：Fabric 不自带，需打包进模组（common 与 AvalonBase 均依赖）
     include implementation("com.electronwill.night-config:core:3.6.4")
     include implementation("com.electronwill.night-config:toml:3.6.4")
