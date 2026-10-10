@@ -19,6 +19,9 @@
         ],
         "client": [
             "com.authcmd.mod.client.AuthCmdClient"
+        ],
+        "modmenu": [
+            "com.authcmd.mod.client.ModMenuConfigEntry"
         ]
     },
     "mixins": [
@@ -34,9 +37,13 @@
         "avalonbase": ">=1.0.0"
     },
     "custom": {
+        "catalogue": {
+            "configFactory": "com.authcmd.mod.client.CatalogueConfigEntry"
+        },
         "modmenu": {
-            "hidden": true,
-            "badges": []
+            "links": {
+                "authcmd.feedback": "https://issue.mengcai.online/"
+            }
         }
     }
 }

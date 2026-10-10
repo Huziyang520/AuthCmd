@@ -15,11 +15,6 @@ neoForge {
     // Automated decoration of Dependencies for Dev/Prod builds, and ModMaven publishing
     addModdingDependenciesTo(sourceSets.main)
 
-    parchment {
-        minecraftVersion = parchment_minecraft
-        mappingsVersion = parchment_version
-    }
-
     runs {
         client {
             client()
