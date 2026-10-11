@@ -7,6 +7,9 @@ import com.authcmd.mod.event.CommandTreeLogic;
 import com.authcmd.mod.event.GameModeLogic;
 import com.authcmd.mod.event.GuiEventHandler;
 import com.authcmd.mod.event.PlayerJoinLogic;
+import com.authcmd.mod.network.AvalonNetworkBridge;
+import com.authcmd.mod.network.AuthCmdSyncPacket;
+import com.authcmd.mod.network.NetworkChannels;
 import com.mojang.logging.LogUtils;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -16,6 +19,7 @@ import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -43,6 +47,8 @@ public class AuthCmdMod {
         // 进而解析其引用的 Avalon GUI 类（未装 AvalonBase 时触发 NoClassDefFoundError）。
         if (FMLEnvironment.dist == Dist.CLIENT) {
             GuiEventHandler.register();
+            // 模组列表 Config 按钮（原生 Forge 扩展点，Catalogue/Configured 同样认它）
+            com.authcmd.mod.client.ForgeConfigScreens.register();
         }
     }
 
@@ -58,7 +64,25 @@ public class AuthCmdMod {
         // 注入命令树重发回调：手改 TOML 热加载生效时，让已在线玩家的补全树反映最新白名单
         AuthCmdConfig.setCommandTreeResender(() ->
                 server.getPlayerList().getPlayers().forEach(ClientTreeResender::resend));
+        // 注入配置重播回调：手改 TOML 热加载生效时，重播 SYNC 包让 show_pause_button 等开关也即时生效
+        AuthCmdConfig.setConfigBroadcaster(() ->
+                AvalonNetworkBridge.sendToAll(server, NetworkChannels.SYNC,
+                        new AuthCmdSyncPacket(AuthCmdConfig.mode, AuthCmdConfig.allowEntitySelectors, AuthCmdConfig.showPauseButton,
+                                AuthCmdConfig.enableAnimations,
+                                AuthCmdConfig.nonOpWhitelist, AuthCmdConfig.opBlacklist,
+                                AuthCmdConfig.nonOpExempt, AuthCmdConfig.opExempt)));
         LOGGER.info("AuthCmd config initialized");
+    }
+
+    /**
+     * 服务端每 tick 检查配置热加载：手改 config/authcmd.toml 后无需命令 / 进服等触发即可重播给在线玩家。
+     * 内部有 1s 节流，实际每 tick 只做一次毫秒比较。
+     */
+    @SubscribeEvent
+    public void onServerTick(TickEvent.ServerTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) {
+            AuthCmdConfig.reloadIfChanged();
+        }
     }
 
     @SubscribeEvent
@@ -76,8 +100,10 @@ public class AuthCmdMod {
 
     @SubscribeEvent
     public void onPlayerChangeGameMode(PlayerEvent.PlayerChangeGameModeEvent event) {
-        if (!(event.getEntity() instanceof ServerPlayer player)) return;
-        GameModeLogic.onChangeGameMode(player, event.getCurrentGameMode());
+        if (event.getEntity() instanceof ServerPlayer player
+                && GameModeLogic.shouldBlock(player, event.getCurrentGameMode())) {
+            event.setCanceled(true);
+        }
     }
 
     @SubscribeEvent

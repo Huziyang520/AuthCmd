@@ -24,7 +24,7 @@ import net.minecraft.resources.ResourceLocation;
 public class GuiEventHandler {
 
     private static final ResourceLocation BUTTON_TEXTURE =
-            new ResourceLocation(Constants.MOD_ID, "textures/gui/button.png");
+                            new ResourceLocation(Constants.MOD_ID, "textures/gui/button.png");
 
     public static void register() {
         ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
@@ -35,6 +35,11 @@ public class GuiEventHandler {
 
             Minecraft mc = Minecraft.getInstance();
             if (mc.player == null) return;
+
+            // 热加载：本机是主机（单机 / 局域网房主）时按 config/authcmd.toml 刷新，
+            // 保证手改 show_pause_button 后无需重启即可反映到暂停页按钮；联机客户端走服务端 SYNC，不读本地文件
+            if (mc.hasSingleplayerServer()) AuthCmdConfig.reloadIfChanged();
+
             if (!AuthCmdConfig.showPauseButton) return;
 
             int screenWidth = screen.width;

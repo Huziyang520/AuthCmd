@@ -5,6 +5,7 @@
     "refmap": "authcmd.refmap.json",
     "mixins": [],
     "client": [
+        "ClientSuggestionProviderMixin",
         "GameModeSwitcherScreenMixin",
         "KeyboardHandlerMixin"
     ],

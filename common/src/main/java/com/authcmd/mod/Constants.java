@@ -12,7 +12,4 @@ public class Constants {
     public static final String MOD_ID = "authcmd";
     public static final String MOD_NAME = "AuthCmd";
     public static final Logger LOG = LoggerFactory.getLogger(MOD_NAME);
-
-    
-    public static final String BUILD_MARKER = "20260828";
 }

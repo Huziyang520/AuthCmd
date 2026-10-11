@@ -25,6 +25,11 @@ dependencies {
     modCompileOnly(avalonJar)
     modLocalRuntime(avalonJar)
 
+    // Mod Menu 仅编译期需要：modCompileOnly 会被 remap 成 named，且永不打进产物 jar。
+    // 必须用 1.20.x 档的 7.2.2 —— 高版本档（15.0.2 等）是 Java 21 字节码（major 65），
+    // 本分支用 JDK 17 编译（major 61），javac 会报“类文件具有错误的版本 65.0”。
+    modCompileOnly "com.terraformersmc:modmenu:7.2.2"
+
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
     // nightconfig（TOML）：Fabric 不自带，需打包进模组（common 与 AvalonBase 均依赖）
     include implementation("com.electronwill.night-config:core:3.6.4")
