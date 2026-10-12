@@ -173,6 +173,7 @@ public class AuthCmdScreen extends AvalonConfigScreen {
 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        renderBackground(graphics, mouseX, mouseY, partialTick);
         // 开/关屏动画：命中测试用动画坐标系（自绘控件与自绘文字才能跟着位移/缩放对齐）
         mouseX = (int) animation().localX(mouseX, width);
         mouseY = (int) animation().localY(mouseY, height);
@@ -224,32 +225,6 @@ public class AuthCmdScreen extends AvalonConfigScreen {
             ButtonFrames.render(graphics, this, modern.palette());
         }
 
-        // ─── 光标 ───
-        boolean showHand = false;
-        if (canEdit) {
-            for (var w : children()) {
-                if (w instanceof ThemedButton btn && btn.active && btn.isHoveredOrFocused()) {
-                    showHand = true;
-                    break;
-                }
-            }
-            if (!showHand) {
-                for (int i = 0; i < 4; i++) {
-                    if (modeRadios[i].isClicked(mouseX, mouseY, font, yo(modeRadios[i].relY))) {
-                        showHand = true;
-                        break;
-                    }
-                }
-            }
-            if (!showHand && (showPauseToggle.isClicked(mouseX, mouseY, font, yo(showPauseToggle.relY))
-                    || enableAnimationsToggle.isClicked(mouseX, mouseY, font, yo(enableAnimationsToggle.relY))
-                    || allowSelectorsToggle.isClicked(mouseX, mouseY, font, yo(allowSelectorsToggle.relY)))) {
-                showHand = true;
-            }
-            if (!showHand && (hoveredCommandRow >= 0 || hoveredExemptRow >= 0)) showHand = true;
-        }
-        // 1.21.1 档的 AvalonConfigScreen#updateCursor 不接收 GuiGraphics（该参数在本档未被使用）。
-        updateCursor(showHand);
 
         // Hover box for truncated radio/toggle labels: show the full original text.
         // Drawn last (above cards, widgets and the read-only overlay) so it is never covered.
