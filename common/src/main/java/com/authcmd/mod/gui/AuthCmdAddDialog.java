@@ -1,6 +1,5 @@
 package com.authcmd.mod.gui;
 
-import com.avalon.base.gui.GuiCursor;
 import com.avalon.base.gui.anim.ScreenAnim;
 import com.avalon.base.gui.anim.ScreenAnimType;
 import com.avalon.base.gui.theme.GuiTheme;
@@ -155,25 +154,8 @@ public class AuthCmdAddDialog extends Screen {
             ButtonFrames.render(g, this, modern.palette());
         }
 
-        // ─── 光标：仅当鼠标真正悬停在按钮或输入框上才显示手形 ───
-        // 注意不能用 isHoveredOrFocused()：输入框始终处于聚焦状态（setFocused(true)），
-        // isFocused 恒为 true 会导致手形永不消失。这里一律改用"鼠标是否悬停"判断。
-        boolean showHand = false;
-        if (addButton.isHovered() && addButton.active) showHand = true;
-        if (!showHand && doneButton.isHovered()) showHand = true;
-        if (!showHand && input.isMouseOver(mouseX, mouseY)) showHand = true;
-        setCursor(g, showHand);
-
         anim.endFrame(g, width, height);
         // 防闪（SKILL.md §10.28）：切父界面的动作已挪到背景方法的提前 return 分支，这里不再切屏
-    }
-
-    /**
-     * 1.21.8 没有帧末统一 apply 的光标请求队列，光标由 GLFW 直接设置：
-     * 只在需要手形时设手形、不设箭头，避免盖掉输入框等原版控件自己设置的光标。
-     */
-    private void setCursor(GuiGraphics g, boolean showHand) {
-        if (showHand) GuiCursor.applyHand();
     }
 
     @Override
