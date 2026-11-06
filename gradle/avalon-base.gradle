@@ -16,6 +16,7 @@
 // 依赖会静默消失，最终以「找不到 com.avalon.* 包」的形式暴露，排查成本很高。
 ext.resolveAvalonJar = { String loader ->
     String mc = project.property('mc_range_label')
+    def repoRoot = project.rootProject.projectDir.parentFile
 
     // 优先级 1：显式指定文件（-Pavalon_fabric_jar=... / -Pavalon_forge_jar=... / 通用 -Pavalon_jar=...）
     def explicit = project.findProperty("avalon_${loader}_jar") ?: project.findProperty('avalon_jar')
@@ -30,19 +31,17 @@ ext.resolveAvalonJar = { String loader ->
     // 这样整个项目被挪动或多套一层目录时路径依然成立。
     def searchDirs = [
             project.findProperty('avalon_dev_dir'),
-            "${rootDir}/libs",
-            "${rootDir}/../AvalonBase/${mc}/${loader}/build/devlibs",
-            "${rootDir}/../AvalonBase/${mc}/${loader}/build/libs",
-            "${rootDir}/../../AvalonBase/${mc}/${loader}/build/devlibs",
-            "${rootDir}/../../AvalonBase/${mc}/${loader}/build/libs",
+            "${repoRoot}/libs",
+            "${repoRoot}/../../AvalonBase/${mc}/${loader}/build/devlibs",
+            "${repoRoot}/../../AvalonBase/${mc}/${loader}/build/libs",
+            "${repoRoot}/../../../AvalonBase/${mc}/${loader}/build/devlibs",
+            "${repoRoot}/../../../AvalonBase/${mc}/${loader}/build/libs",
     ].findAll { it != null }.collect { project.file(it) }
 
     def candidates = searchDirs.findAll { it.isDirectory() }
             .collectMany { dir ->
                 project.fileTree(dir) {
-                    // AvalonBase 各 loader 产物命名大小写不统一：fabric 用 mod_id（avalonbase-*），
-                    // forge/neoforge 用 mod_name（AvalonBase-*）。这里同时兼容两种。
-                    include "avalonbase-${loader}-${mc}-*.jar", "AvalonBase-${loader}-${mc}-*.jar"
+                    include "avalonbase-${loader}-${mc}-*.jar"
                     exclude "*-sources.jar", "*-javadoc.jar"
                 }.files
             }
