@@ -28,8 +28,8 @@ dependencies {
     // 编译期来源与 fabric 子项目一致（common 源码经由 multiloader-loader 注入，需各自声明引用）。
     // 固定文件名：build/libs 永久保留各旧版 jar（铁律不删），通配会把多个版本同时放进 classpath；
     // AvalonBase 升版时必须同步修改此处文件名。
-    compileOnly fileTree(project.file("../../../AvalonBase/1.21.2-1.21.5/neoforge/build/libs")) {
-        include "AvalonBase-neoforge-1.21.5-1.5.1.jar"
+    compileOnly fileTree(project.file("../../../${avalon_dir}/neoforge/build/libs")) {
+        include avalon_neoforge_jar
     }
     compileOnly project(":common")
 
