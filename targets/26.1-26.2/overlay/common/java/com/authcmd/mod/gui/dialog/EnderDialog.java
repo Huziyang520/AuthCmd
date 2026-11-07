@@ -60,7 +60,7 @@ abstract class EnderDialog extends Screen {
         this.parentScreen = parent;
         this.bodyText = body;
         this.theme = theme;
-        this.anim = AuthCmdConfig.enableAnimations
+        this.anim = AuthCmdConfig.enableAnimations()
                 ? new ScreenAnim(ScreenAnimType.SCALE_BOUNCE, ScreenAnimType.SCALE_BOUNCE)
                 : ScreenAnim.disabled();
         this.anim.playOpen();

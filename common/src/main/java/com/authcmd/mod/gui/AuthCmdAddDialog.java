@@ -53,7 +53,7 @@ public class AuthCmdAddDialog extends Screen {
         this.command = command;
         this.targetList = targetList;
         this.theme = new ModernTheme();
-        this.anim = AuthCmdConfig.enableAnimations
+        this.anim = AuthCmdConfig.enableAnimations()
                 ? new ScreenAnim(ScreenAnimType.SCALE_BOUNCE, ScreenAnimType.SCALE_BOUNCE)
                 : ScreenAnim.disabled();
         this.anim.playOpen();

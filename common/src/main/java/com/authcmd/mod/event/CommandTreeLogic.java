@@ -92,7 +92,7 @@ public final class CommandTreeLogic {
         grantCount = 0;
         LOGGER.info("[AuthCmd] Command tree patched - {} nodes tracked (+{} new), mode={}, whitelist={}",
                 NODE_ROOT_NAMES.size(), NODE_ROOT_NAMES.size() - before,
-                AuthCmdConfig.mode, AuthCmdConfig.nonOpWhitelist);
+                AuthCmdConfig.mode(), AuthCmdConfig.nonOpWhitelist());
     }
 
     /**
@@ -141,7 +141,7 @@ public final class CommandTreeLogic {
         public boolean test(CommandSourceStack source) {
             if (original != null && original.test(source)) return true;
 
-            AuthCmdConfig.reloadIfChanged();
+            AuthCmdConfig.CONFIG.reloadIfChanged();
             if (!isModeActive()) return false;
 
             for (String rootName : rootNames) {
@@ -159,8 +159,8 @@ public final class CommandTreeLogic {
 
     /** 功能一（非OP白名单）是否在当前 mode 下生效。 */
     private static boolean isModeActive() {
-        return AuthCmdConfig.MODE_NON_OP.equals(AuthCmdConfig.mode)
-                || AuthCmdConfig.MODE_BOTH.equals(AuthCmdConfig.mode);
+        return AuthCmdConfig.MODE_NON_OP.equals(AuthCmdConfig.mode())
+                || AuthCmdConfig.MODE_BOTH.equals(AuthCmdConfig.mode());
     }
 
     /**
@@ -173,7 +173,7 @@ public final class CommandTreeLogic {
     static boolean isWhitelisted(String rootName) {
         String n = AuthCmdConfig.normalizeCommand(rootName);
         if (n.isEmpty()) return false;
-        return AuthCmdConfig.containsNormalized(AuthCmdConfig.nonOpWhitelist, n, true);
+        return AuthCmdConfig.containsNormalized(AuthCmdConfig.nonOpWhitelist(), n, true);
     }
 
     private static void setRequirement(CommandNode<CommandSourceStack> node, Predicate<CommandSourceStack> predicate) {

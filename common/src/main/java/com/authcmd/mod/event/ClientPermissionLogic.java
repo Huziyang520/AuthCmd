@@ -37,7 +37,7 @@ public final class ClientPermissionLogic {
      * 未收到服务端配置（联机首帧 / 未装 AvalonBase）时本地 mode 为默认值 ⇒ 不放行。
      */
     public static boolean shouldGrantEntitySelectors() {
-        if (!AuthCmdConfig.allowEntitySelectors) return false;
+        if (!AuthCmdConfig.allowEntitySelectors()) return false;
         return AuthCmdConfig.resolveDomain(false) == 1;
     }
 

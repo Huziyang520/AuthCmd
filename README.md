@@ -29,11 +29,12 @@ Four modes are available: **disabled**, **non-OP whitelist only**, **OP blacklis
 
 ## The in-game editor
 
-- Open it from the **pause menu** (the mod's edit button) or from the **mod list** → *AuthCmd* → *Config*.
-- The visual editor needs the optional library **AvalonBase** installed on the client, plus operator permission on the server. Without AvalonBase the mod still works — you just edit the config file by hand.
+- Open it from the **mod list** → *AuthCmd* → *Config*, or from the **pause menu** (that button exists only with **AvalonBase** installed).
+- The mod-list screen is generated from the config schema and needs **Cloth Config API** on the client; with **AvalonBase** installed, the pause-menu button opens AvalonBase's own editor. Without either library the mod still works — you just edit the config file by hand.
+  - Cloth Config API: <https://www.curseforge.com/minecraft/mc-mods/cloth-config>
   - AvalonBase: <https://www.curseforge.com/minecraft/mc-mods/avalonbase>
-- If the server owner turned the edit entry off, the mod list entry still opens, but only shows a short "entry closed" notice.
-- The editor's *Interface* section contains a **Show pause button** switch and an **Enable interface animations** switch (both on by default).
+- Editing needs operator permission on the server; without it the screen is read-only. If the server owner turned the edit entry off, the mod-list entry shows a short "entry closed" notice and the pause button is gone.
+- The editor's *Interface* section contains an **Enable config entry** switch and an **Enable interface animations** switch (both on by default).
 
 ## Chat messages
 
@@ -46,7 +47,7 @@ Blocked commands answer with a red `AuthCmd: This command has been disabled!`. B
 | Key | Meaning |
 |---|---|
 | `mode` | `disabled` / `non_op_only` / `op_only` / `both` |
-| `show_pause_button` | Show the edit button in the pause menu |
+| `enable_config_entry` | Allow entering the visual config screen (also shows the pause button when AvalonBase is installed) |
 | `enable_animations` | Interface open/close animations |
 | `non_op_whitelist` / `op_blacklist` | The command lists |
 | `non_op_exempt` / `op_exempt` | The exemption lists |
@@ -103,11 +104,12 @@ AuthCmd 给服主提供两套互相独立的规则，外加一个共用行为：
 
 ## 游戏内编辑界面
 
-- 从**暂停菜单**的编辑按钮进入，或从**模组列表** → *AuthCmd* → *配置* 进入。
-- 可视化编辑界面需要客户端安装可选前置库 **AvalonBase**，并且在服务端拥有管理员权限；不装 AvalonBase 也能正常使用，只是只能手改配置文件。
+- 从**模组列表** → *AuthCmd* → *配置* 进入，或从**暂停菜单**的编辑按钮进入（该按钮只在装了 **AvalonBase** 时出现）。
+- 模组列表里的界面由配置项自动生成，需要客户端安装 **Cloth Config API**；装了 **AvalonBase** 时，暂停菜单按钮打开的是 AvalonBase 自己的界面。两者都没装也能正常使用，只是只能手改配置文件。
+  - Cloth Config API 下载：<https://www.curseforge.com/minecraft/mc-mods/cloth-config>
   - AvalonBase 下载：<https://www.curseforge.com/minecraft/mc-mods/avalonbase>
-- 如果服主关闭了编辑入口，模组列表入口仍会打开，但只显示一句"服务端关闭了编辑页面入口"的提示。
-- 界面的「界面设置」里有 **显示暂停按钮** 与 **启用动画效果** 两个开关（默认都开启）。
+- 编辑需要在服务端拥有管理员权限，否则界面只读；服主关闭编辑入口后，模组列表入口只显示一句"服务端关闭了可视化配置界面入口"，暂停菜单按钮也不再出现。
+- 界面的「界面设置」里有 **启用配置入口** 与 **启用动画效果** 两个开关（默认都开启）。
 
 ## 聊天提示
 
@@ -120,7 +122,7 @@ AuthCmd 给服主提供两套互相独立的规则，外加一个共用行为：
 | 键 | 含义 |
 |---|---|
 | `mode` | `disabled` / `non_op_only` / `op_only` / `both` |
-| `show_pause_button` | 是否显示暂停菜单里的编辑按钮 |
+| `enable_config_entry` | 是否允许进入可视化配置界面（装了 AvalonBase 时也决定暂停菜单按钮） |
 | `enable_animations` | 是否启用界面开/关动画 |
 | `non_op_whitelist` / `op_blacklist` | 指令名单 |
 | `non_op_exempt` / `op_exempt` | 豁免玩家名单 |

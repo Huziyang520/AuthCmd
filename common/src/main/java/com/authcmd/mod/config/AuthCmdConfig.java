@@ -1,21 +1,18 @@
 package com.authcmd.mod.config;
 
-import com.authcmd.mod.Constants;
-import com.electronwill.nightconfig.core.Config;
-import com.electronwill.nightconfig.toml.TomlParser;
-import com.electronwill.nightconfig.toml.TomlWriter;
-import com.mojang.logging.LogUtils;
-import org.slf4j.Logger;
+import com.camelot.config.CamelotConfig;
+import com.camelot.config.ConfigOption;
+import com.camelot.config.ConfigSchema;
+import com.camelot.net.CamelotNet;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
- * AuthCmd 指令权限控制器配置（config/authcmd.toml）。
+ * AuthCmd 指令权限配置（config/authcmd.toml）。
+ *
+ * <p>字段、默认值与文件顺序由 {@link #SCHEMA} 声明；读写、热加载、服务端下发与配置界面
+ * 由 Camelot 按 schema 处理，本类只提供取值方法与判定逻辑。
  *
  * <p>双套权限体系：
  * <ul>
@@ -26,260 +23,95 @@ import java.util.List;
  * </ul>
  *
  * <p>生效范围 {@code mode}：disabled（全关闭，默认）/ non_op_only / op_only / both。
- * 游戏模式切换无独立开关，由 gamemode 指令的限制自动带出。
- *
- * <p>配置读写使用原生 {@code com.electronwill.nightconfig}（与 OnlyTPConfig 一致），
- * 不再依赖 AvalonBase 的 {@code AvalonToml}，使 AuthCmd 可在未安装 AvalonBase 的纯服务端独立运行。
  */
-public class AuthCmdConfig {
-
-    private static final Logger LOGGER = LogUtils.getLogger();
-
-    private static final Path CONFIG_PATH = Paths.get("config", "authcmd.toml");
-
-       // 记录配置文件最后修改时间，用于热加载判定（等价于原 AvalonToml.isChanged 语义）
-    private static volatile long lastModified = -1L;
-
-    /** 热加载最小检查间隔（毫秒）。reloadIfChanged 可能在 sendCommands 中被逐节点高频调用，
-     *  不节流会导致每次玩家登录产生数千次文件 stat。 */
-    private static final long RELOAD_CHECK_INTERVAL_MS = 1000L;
-
-    /** 上次真正执行文件 stat 的时刻。 */
-    private static volatile long lastCheckTime = 0L;
-
+public final class AuthCmdConfig {
 
     public static final String MODE_DISABLED = "disabled";
     public static final String MODE_NON_OP = "non_op_only";
     public static final String MODE_OP = "op_only";
     public static final String MODE_BOTH = "both";
 
-    /** 生效范围：disabled / non_op_only / op_only / both。 */
-    public static String mode = MODE_DISABLED;
+    public static final ConfigSchema SCHEMA = new ConfigSchema("authcmd", "authcmd.toml", "gui.authcmd.title",
+            List.of(
+                    ConfigOption.select("mode", MODE_DISABLED,
+                                    MODE_DISABLED, MODE_NON_OP, MODE_OP, MODE_BOTH)
+                            .comment("mode: \"disabled\"  \"non_op_only\"  \"op_only\"  or  \"both\""),
+                    ConfigOption.bool("allow_entity_selectors", true),
+                    ConfigOption.bool("enable_config_entry", true).legacy("show_pause_button"),
+                    ConfigOption.list("non_op_whitelist", List.of()),
+                    ConfigOption.list("op_blacklist", List.of()),
+                    ConfigOption.list("non_op_exempt", List.of()),
+                    ConfigOption.list("op_exempt", List.of()),
+                    ConfigOption.bool("enable_animations", true),
+                    ConfigOption.switchInt("show_tips", 1).clientOnly()));
 
-    /**
-     * 非OP提权指令是否允许使用**目标选择器**（{@code @a} / {@code @p} / {@code @e} …）。
-     *
-     * <p>关闭时两侧同时生效：客户端不再把实体选择器权限视为已授予（照原样报错、不补全），
-     * 服务端对含 {@code @} 的提权指令直接拒绝并提示。
-     */
-    public static boolean allowEntitySelectors = true;
-
-    /** 是否显示暂停页面可视化编辑按钮。 */
-    public static boolean showPauseButton = true;
-
-    /** 界面是否播放开/关动画（AvalonBase 动画 API；默认开启）。客户端视觉项，随 SYNC 下发。 */
-    public static boolean enableAnimations = true;
-
-    /** 客户端进入世界时若未装 AvalonBase，是否显示「安装AvalonBase启用可视化编辑」提示。0=关闭, 1=开启(默认)。 */
-    public static int showTips = 1;
-    // Client-side only: whether the main-menu local-config notice dialog shows. Never synced.
-    public static int showLocalConfigNotice = 1;
-
-    /** 功能一：非OP指令白名单（提权，默认为空）。 */
-    public static List<String> nonOpWhitelist = new ArrayList<>();
-
-    /** 功能二：OP指令黑名单（降权，默认为空）。 */
-    public static List<String> opBlacklist = new ArrayList<>();
-
-    /** 功能一：非OP豁免玩家（完全豁免，不受非OP白名单限制）。 */
-    public static List<String> nonOpExempt = new ArrayList<>();
-
-    /** 功能二：OP豁免玩家（完全豁免，不受OP黑名单限制）。 */
-    public static List<String> opExempt = new ArrayList<>();
-
-    /** 是否已初始化（用于热加载判定）。 */
-    private static volatile boolean initialized = false;
-
-    /** 热加载确认配置文件变更后，由平台入口注入的回调：向在线玩家重发命令树（config 层无服务端引用，用回调解耦）。 */
-    private static volatile Runnable commandTreeResender;
-
-    /** 热加载确认配置文件变更后，由平台入口注入的回调：向在线玩家重播配置同步包。 */
-    private static volatile Runnable configBroadcaster;
-
-    /**
-     * 客户端是否已收到过服务端下发的配置同步。
-     *
-     * <p>用于区分"客户端已知配置 = 功能未生效"与"客户端根本还没拿到配置"两种情况：
-     * 未装 AvalonBase 时客户端不会注册网络接收器（{@code CommonClass.init} 直接返回），
-     * 也收不到配置同步；联机首帧同样存在时间窗。此时客户端不应按本地默认值（disabled / 空名单）
-     * 做否定判定，否则会出现"名单内命令可用、但 F3+F4 切换器打不开"的不一致。
-     * 该判定只由客户端侧调用方使用，服务端侧语义无影响。
-     */
-    private static volatile boolean clientConfigSynced = false;
+    public static final CamelotConfig CONFIG = new CamelotConfig(SCHEMA);
 
     private AuthCmdConfig() {
     }
 
-    /**
-     * 服务端启动时初始化配置：不存在则写默认，存在则读取。
-     */
+    /** 服务端与客户端各读一次本地文件；联机客户端之后以服务端下发的值为准。 */
     public static void init() {
-        try {
-            Files.createDirectories(CONFIG_PATH.getParent());
-            if (Files.exists(CONFIG_PATH) && Files.size(CONFIG_PATH) > 0) {
-                read();
-            } else {
-                resetDefaults();
-                save();
-            }
-        } catch (Exception e) {
-            LOGGER.error("Fatal config error", e);
-            resetDefaults();
-        }
-        initialized = true;
-        LOGGER.info("[AuthCmd] Config loaded - mode: {}, showPauseButton: {}", mode, showPauseButton);
+        CONFIG.load();
     }
 
-    private static Config buildConfig() {
-        Config cfg = Config.inMemory();
-        // 写盘顺序即文件里的顺序：模式与行为 → 界面 → 提示 → 名单子表
-        // （子表必须放在所有标量之后，否则 TOML 会把先写的标量并进子表）
-        cfg.set("mode", mode);
-        cfg.set("allow_entity_selectors", allowEntitySelectors);
-        cfg.set("show_pause_button", showPauseButton);
-        cfg.set("enable_animations", enableAnimations);
-        cfg.set("show_tips", showTips);
-        cfg.set("show_local_config_notice", showLocalConfigNotice);
-        setSubList(cfg, "non_op_whitelist", nonOpWhitelist);
-        setSubList(cfg, "op_blacklist", opBlacklist);
-        setSubList(cfg, "non_op_exempt", nonOpExempt);
-        setSubList(cfg, "op_exempt", opExempt);
-        return cfg;
+    // ─── 取值 ───
+
+    public static String mode() {
+        return CONFIG.getString("mode");
     }
 
-    /**
-     * 读取配置。
-     */
-    public static void read() {
-        try {
-            String text = Files.readString(CONFIG_PATH);
-            Config cfg = new TomlParser().parse(text);
-            mode = cfg.getOrElse("mode", MODE_DISABLED);
-            allowEntitySelectors = cfg.getOrElse("allow_entity_selectors", true);
-            showPauseButton = cfg.getOrElse("show_pause_button", true);
-            enableAnimations = cfg.getOrElse("enable_animations", true);
-            showTips = cfg.getOrElse("show_tips", 1);
-            showLocalConfigNotice = cfg.getOrElse("show_local_config_notice", 1);
-            nonOpWhitelist = new ArrayList<>(getSubList(cfg, "non_op_whitelist"));
-            opBlacklist = new ArrayList<>(getSubList(cfg, "op_blacklist"));
-            nonOpExempt = new ArrayList<>(getSubList(cfg, "non_op_exempt"));
-            opExempt = new ArrayList<>(getSubList(cfg, "op_exempt"));
-            lastModified = Files.getLastModifiedTime(CONFIG_PATH).toMillis();
-        } catch (Exception e) {
-            LOGGER.error("Failed to read config, using defaults", e);
-            resetDefaults();
-        }
+    public static boolean allowEntitySelectors() {
+        return CONFIG.getBool("allow_entity_selectors");
     }
 
-    /**
-     * 写盘。由服务端收到客户端更新包后调用，或首次初始化写默认时调用。
-     */
-    public static void save() {
-        try {
-            String toml = new TomlWriter().writeToString(buildConfig());
-            // 为 mode 注入示例注释（TOML 解析时会自动忽略注释，安全）
-            toml = insertModeComment(toml);
-            Files.writeString(CONFIG_PATH, toml);
-            lastModified = Files.getLastModifiedTime(CONFIG_PATH).toMillis();
-            LOGGER.info("[AuthCmd] Config saved - mode: {}, showPauseButton: {}", mode, showPauseButton);
-        } catch (Exception e) {
-            LOGGER.error("Failed to write config", e);
-        }
+    /** 配置入口开关：关闭后暂停界面无按钮，世界内进入入口显示"服务端已关闭"。 */
+    public static boolean enableConfigEntry() {
+        return CONFIG.getBool("enable_config_entry");
     }
 
-    /**
-     * 在 TOML 字符串的 {@code mode = "..."} 行前插入示例注释，说明可选值。
-     * 仅在 save() 写盘时调用；read() 使用 TomlParser 会忽略注释，不影响解析。
-     */
-    private static String insertModeComment(String toml) {
-        String marker = "mode = \"";
-        int idx = toml.indexOf(marker);
-        if (idx < 0) return toml; // 未找到则原样返回
-        String comment = "# mode: \"disabled\"  \"non_op_only\"  \"op_only\"  or  \"both\"\n";
-        return toml.substring(0, idx) + comment + toml.substring(idx);
+    public static boolean enableAnimations() {
+        return CONFIG.getBool("enable_animations");
     }
 
-     /**
-     * 热加载：若配置文件被外部修改，则重新读取并刷新内存字段。
-     * 确认变更后触发命令树重发回调，使已在线玩家的补全树反映最新白名单。
-     *
-     * <p>最多每 {@link #RELOAD_CHECK_INTERVAL_MS} 毫秒做一次文件 stat：本方法会被命令树
-     * 动态谓词高频调用，无节流会造成大量无谓的磁盘 IO。
-     */
-    public static void reloadIfChanged() {
-        if (!initialized) return;
-
-        long now = System.currentTimeMillis();
-        if (now - lastCheckTime < RELOAD_CHECK_INTERVAL_MS) return;
-        lastCheckTime = now;
-
-        try {
-            long modified = Files.getLastModifiedTime(CONFIG_PATH).toMillis();
-            if (modified == lastModified) return;
-            read();
-            LOGGER.info("[AuthCmd] Config hot-reloaded");
-            if (commandTreeResender != null) {
-                commandTreeResender.run();
-            }
-            // 手改 TOML 时命令树重发只覆盖补全；show_pause_button 等非命令类字段需要重播配置包才对已在线客户端生效
-            if (configBroadcaster != null) {
-                configBroadcaster.run();
-            }
-        } catch (Exception e) {
-            LOGGER.error("Failed to hot-reload config", e);
-        }
+    /** 功能一：非OP指令白名单（提权）。 */
+    public static List<String> nonOpWhitelist() {
+        return CONFIG.getList("non_op_whitelist");
     }
 
-
-    /**
-     * 注入命令树重发回调。仅服务端入口在服务器启动后调用一次；
-     * 纯客户端或无服务端上下文时留空（非 OP 补全由服务端命令树决定）。
-     */
-    public static void setCommandTreeResender(Runnable resender) {
-        commandTreeResender = resender;
+    /** 功能二：OP指令黑名单（降权）。 */
+    public static List<String> opBlacklist() {
+        return CONFIG.getList("op_blacklist");
     }
 
-    /**
-     * 注入配置重播回调。仅服务端入口在服务器启动后调用一次；
-     * 手改 TOML 触发热加载时向在线玩家重播 SYNC 包，使 {@code show_pause_button} 等非命令类开关也即时生效。
-     */
-    public static void setConfigBroadcaster(Runnable broadcaster) {
-        configBroadcaster = broadcaster;
+    /** 功能一：非OP豁免玩家。 */
+    public static List<String> nonOpExempt() {
+        return CONFIG.getList("non_op_exempt");
     }
 
-    /** 客户端收到服务端配置同步后置位（仅客户端侧语义）。 */
-    public static void markClientConfigSynced() {
-        clientConfigSynced = true;
+    /** 功能二：OP豁免玩家。 */
+    public static List<String> opExempt() {
+        return CONFIG.getList("op_exempt");
     }
 
-    /** 客户端是否已收到过服务端配置同步。 */
+    /** 界面保存后写回：立即生效并落盘（联机客户端随后由服务端下发覆盖）。 */
+    public static void applyAndSave(String newMode, boolean selectors, boolean entry, boolean animations,
+                                    List<String> whitelist, List<String> blacklist,
+                                    List<String> nonOpExempts, List<String> opExempts) {
+        CONFIG.set("mode", newMode);
+        CONFIG.set("allow_entity_selectors", selectors);
+        CONFIG.set("enable_config_entry", entry);
+        CONFIG.set("enable_animations", animations);
+        CONFIG.set("non_op_whitelist", new ArrayList<>(whitelist));
+        CONFIG.set("op_blacklist", new ArrayList<>(blacklist));
+        CONFIG.set("non_op_exempt", new ArrayList<>(nonOpExempts));
+        CONFIG.set("op_exempt", new ArrayList<>(opExempts));
+        CONFIG.save();
+    }
+
+    /** 客户端是否已收到过服务端下发的配置；未收到时不应按本地默认值做否定判定。 */
     public static boolean isClientConfigSynced() {
-        return clientConfigSynced;
-    }
-
-    private static List<String> getSubList(Config cfg, String section) {
-        Config sub = cfg.get(section);
-        if (sub == null) return new ArrayList<>();
-        return new ArrayList<>(sub.getOrElse("blacklist", Collections.emptyList()));
-    }
-
-    private static void setSubList(Config cfg, String section, List<String> list) {
-        Config sub = Config.inMemory();
-        sub.set("blacklist", list);
-        cfg.set(section, sub);
-    }
-
-    private static void resetDefaults() {
-        mode = MODE_DISABLED;
-        allowEntitySelectors = true;
-        showPauseButton = true;
-        enableAnimations = true;
-        showTips = 1;
-        showLocalConfigNotice = 1;
-        nonOpWhitelist = new ArrayList<>();
-        opBlacklist = new ArrayList<>();
-        nonOpExempt = new ArrayList<>();
-        opExempt = new ArrayList<>();
+        return CamelotNet.isSynced("authcmd");
     }
 
     // ─── 判定方法 ───
@@ -290,7 +122,7 @@ public class AuthCmdConfig {
      * @return 0=不约束；1=功能一（非OP白名单）；2=功能二（OP黑名单）
      */
     public static int resolveDomain(boolean isOp) {
-        reloadIfChanged();
+        String mode = mode();
         if (MODE_DISABLED.equals(mode)) return 0;
         if (MODE_BOTH.equals(mode)) return isOp ? 2 : 1;
         if (MODE_NON_OP.equals(mode)) return isOp ? 0 : 1;
@@ -304,9 +136,8 @@ public class AuthCmdConfig {
      * @param domain 由 {@link #resolveDomain(boolean)} 得出：1=功能一，2=功能二
      */
     public static boolean isExempt(int domain, String playerName) {
-        reloadIfChanged();
-        if (domain == 1) return nonOpExempt.contains(playerName);
-        if (domain == 2) return opExempt.contains(playerName);
+        if (domain == 1) return nonOpExempt().contains(playerName);
+        if (domain == 2) return opExempt().contains(playerName);
         return false;
     }
 
@@ -316,16 +147,15 @@ public class AuthCmdConfig {
      * @param domain 由 {@link #resolveDomain(boolean)} 得出：1=功能一，2=功能二
      */
     public static boolean shouldBlockCommand(int domain, String commandName) {
-        reloadIfChanged();
         if (commandName == null) return false;
         String norm = normalizeCommand(commandName);
         if (domain == 1) {
             // 功能一（非OP，白名单）：未命中白名单 → 拦截（规范化匹配，与命令树补全放行逻辑一致）
-            return !containsNormalized(nonOpWhitelist, norm);
+            return !containsNormalized(nonOpWhitelist(), norm);
         }
         if (domain == 2) {
             // 功能二（OP，黑名单）：命中黑名单 → 拦截（规范化匹配）
-            return containsNormalized(opBlacklist, norm);
+            return containsNormalized(opBlacklist(), norm);
         }
         return false;
     }
@@ -361,21 +191,18 @@ public class AuthCmdConfig {
 
     /**
      * 判断 gamemode/g（同一命令的两个别名）在指定功能域内是否被整体放行。
-     * <p>功能一（白名单）：两个别名任一在白名单即放行，避免只配 {@code gamemode}
-     * 而别名 {@code g} 未配导致游戏模式切换器仍被拦截；
+     * <p>功能一（白名单）：两个别名任一在白名单即放行；
      * 功能二（黑名单）：两个别名任一在黑名单即拦截。
-     * 白名单项做规范化匹配（去 / 前缀、小写），容忍 {@code /gamemode}、{@code GameMode} 等写法。
      */
     public static boolean isGamemodeAllowed(int domain) {
-        reloadIfChanged();
         if (domain == 1) {
-            for (String entry : nonOpWhitelist) {
+            for (String entry : nonOpWhitelist()) {
                 if (isGamemodeCommand(normalizeCommand(entry))) return true;
             }
             return false;
         }
         if (domain == 2) {
-            for (String entry : opBlacklist) {
+            for (String entry : opBlacklist()) {
                 if (isGamemodeCommand(normalizeCommand(entry))) return false;
             }
             return true;

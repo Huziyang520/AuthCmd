@@ -98,7 +98,7 @@ public class CommandLogic {
      * @return true 表示已拦截（并已提示玩家）
      */
     private static boolean deniesEntitySelector(String raw, ServerPlayer player) {
-        if (AuthCmdConfig.allowEntitySelectors) return false;
+        if (AuthCmdConfig.allowEntitySelectors()) return false;
         if (raw == null || raw.indexOf('@') < 0) return false;
         player.sendSystemMessage(ModMsg.red(player, "message.authcmd.selector_blocked"));
         return true;

@@ -30,7 +30,7 @@ public class GameModeLogic {
         boolean isOp = player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER);
         int domain = AuthCmdConfig.resolveDomain(isOp);
         LOGGER.info("[AuthCmd] shouldBlock player={} isOp={} domain={} oldMode={} whitelist={}",
-                player.getName().getString(), isOp, domain, oldGameMode, AuthCmdConfig.nonOpWhitelist);
+                player.getName().getString(), isOp, domain, oldGameMode, AuthCmdConfig.nonOpWhitelist());
         if (domain == 0) return false; // 不在受约束功能域
 
         // 豁免玩家 → 完全放行

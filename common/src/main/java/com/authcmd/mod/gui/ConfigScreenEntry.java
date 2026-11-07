@@ -1,5 +1,6 @@
 package com.authcmd.mod.gui;
 
+import com.camelot.ui.ConfigScreens;
 import com.authcmd.mod.AvalonLink;
 import com.authcmd.mod.Constants;
 import com.authcmd.mod.config.AuthCmdConfig;
@@ -8,98 +9,59 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
 import java.lang.reflect.Constructor;
-import java.util.function.Consumer;
 
 /**
- * Single entry point used by every mod-list config button (Mod Menu, Catalogue,
- * NeoForge mod list) to route into the AuthCmd visual editor.
+ * 可视化配置入口：模组列表的「配置」按钮与暂停界面按钮都从这里进。
  *
- * <p><b>Bytecode rule:</b> this class must never statically reference an
- * AvalonBase type (dialogs) or {@link AuthCmdScreen} (which extends
- * AvalonConfigScreen). Everything is loaded reflectively after the
- * {@link AvalonLink#isAvalonLoaded()} guard, so the mod list stays healthy when
- * AvalonBase is absent (the factory then returns {@code null}).</p>
+ * <p><b>字节码约束</b>：本类不得静态引用 {@code AuthCmdScreen}（它继承 AvalonBase 的屏幕基类），
+ * 一律在 {@link AvalonLink#isAvalonLoaded()} 守卫后反射创建，未装 AvalonBase 时返回 {@code null}。
  */
 public final class ConfigScreenEntry {
 
-    private static final String EDITOR_CLASS = "com.authcmd.mod.gui.AuthCmdScreen";
-    private static final String ACCESS_DENIED_CLASS = "com.authcmd.mod.gui.dialog.AccessDeniedDialog";
-    private static final String LOCAL_NOTICE_CLASS = "com.authcmd.mod.gui.dialog.LocalConfigNoticeDialog";
+    private static final String AVALON_SCREEN = "com.authcmd.mod.gui.AuthCmdScreen";
 
     private ConfigScreenEntry() {
     }
 
     /**
-     * Creates the screen the mod list should show, or {@code null} when
-     * AvalonBase is not installed.
+     * 模组列表按钮进入的界面：世界内且入口已关闭时给二级提示；否则优先自动生成的界面，
+     * 没装 Cloth 时退回 AvalonBase 界面；两者都没有则返回 {@code null}（按钮置灰）。
      */
     public static Screen create(Screen parent) {
         Minecraft mc = Minecraft.getInstance();
+        if (mc.player != null && !AuthCmdConfig.enableConfigEntry()) {
+            return ConfigScreens.entryClosed(parent,
+                    Component.translatable("gui.authcmd.title"),
+                    Component.translatable("gui.authcmd.entry_closed"),
+                    Component.translatable("gui.done"));
+        }
+        // 主菜单（不在世界内）：以本机配置文件为准，不读服务端下发的值
+        if (mc.player == null) {
+            AuthCmdConfig.CONFIG.load();
+        }
+        Screen generated = ConfigScreens.cloth(parent, AuthCmdConfig.CONFIG);
+        return generated != null ? generated : avalonScreen(parent);
+    }
+
+    /** 暂停界面按钮：AvalonBase 界面的唯一入口。未装 AvalonBase 时什么也不做。 */
+    public static void openAvalonScreen() {
+        Screen screen = avalonScreen(null);
+        if (screen != null) {
+            Minecraft.getInstance().setScreenAndShow(screen);
+        }
+    }
+
+    private static Screen avalonScreen(Screen parent) {
         if (!AvalonLink.isAvalonLoaded()) {
             return null;
         }
         try {
-            if (mc.player != null) {
-                // 世界内入口同样先热加载（仅主机场景），保证手改 toml 后入口立即反映
-                if (mc.hasSingleplayerServer()) AuthCmdConfig.reloadIfChanged();
-                // 世界内：入口由 show_pause_button 判定（服务端下发的值），false 时对**所有人（含 OP）**
-                // 都出无权限小窗——保持与服务端"关闭编辑入口"的口径一致。
-                // 恢复途径是改 config/authcmd.toml 触发热加载（整表重读 + SYNC 重播）或重启服务端。
-                if (!AuthCmdConfig.showPauseButton) {
-                    return newAccessDenied(parent);
-                }
-                return newEditor(parent, false);
-            }
-            // Main menu: reload the local file first so static fields cannot keep
-            // values left over from the last server session.
-            AuthCmdConfig.read();
-            if (AuthCmdConfig.showLocalConfigNotice == 0) {
-                return newEditor(parent, true);
-            }
-            return newLocalNotice(parent);
+            Class<?> type = Class.forName(AVALON_SCREEN);
+            Constructor<?> ctor = type.getConstructor(Screen.class);
+            return (Screen) ctor.newInstance(parent);
         } catch (Exception e) {
-            Constants.LOG.error("[AuthCmd] Failed to create config screen entry", e);
+            Constants.LOG.error("[AuthCmd] Failed to open the AvalonBase config screen", e);
             return null;
         }
-    }
-
-    private static Screen newEditor(Screen parent, boolean localEdit) throws Exception {
-        Class<?> clazz = Class.forName(EDITOR_CLASS);
-        Constructor<?> ctor = clazz.getConstructor(Screen.class, boolean.class);
-        return (Screen) ctor.newInstance(parent, localEdit);
-    }
-
-    private static Screen newAccessDenied(Screen parent) throws Exception {
-        Class<?> clazz = Class.forName(ACCESS_DENIED_CLASS);
-        Constructor<?> ctor = clazz.getConstructor(Screen.class, Component.class, Component.class, Component.class);
-        return (Screen) ctor.newInstance(parent,
-                Component.translatable("gui.authcmd.notice_title"),
-                Component.translatable("gui.authcmd.entry_closed"),
-                Component.translatable("gui.authcmd.cancel"));
-    }
-
-    private static Screen newLocalNotice(Screen parent) throws Exception {
-        Class<?> clazz = Class.forName(LOCAL_NOTICE_CLASS);
-        Constructor<?> ctor = clazz.getConstructor(Screen.class, Component.class, Component.class,
-                Component.class, Component.class, Component.class, Consumer.class);
-        Consumer<Boolean> onConfirm = checked -> {
-            try {
-                // The checkbox choice is persisted ONLY when the player confirms.
-                if (checked) {
-                    AuthCmdConfig.showLocalConfigNotice = 0;
-                    AuthCmdConfig.save();
-                }
-                Minecraft.getInstance().setScreenAndShow(newEditor(parent, true));
-            } catch (Exception e) {
-                Constants.LOG.error("[AuthCmd] Failed to open local editor", e);
-            }
-        };
-        return (Screen) ctor.newInstance(parent,
-                Component.translatable("gui.authcmd.notice_title"),
-                Component.translatable("gui.authcmd.local_config_notice"),
-                Component.translatable("gui.authcmd.dont_show_again"),
-                Component.translatable("gui.authcmd.cancel"),
-                Component.translatable("gui.authcmd.confirm"),
-                onConfirm);
     }
 }

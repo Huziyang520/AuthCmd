@@ -1,9 +1,7 @@
 package com.authcmd.mod.gui;
 
-import com.authcmd.mod.AvalonLink;
 import com.authcmd.mod.config.AuthCmdConfig;
-import com.authcmd.mod.network.AuthCmdUpdatePacket;
-import com.authcmd.mod.network.NetworkChannels;
+import com.camelot.net.CamelotNet;
 import com.avalon.base.gui.anim.ScreenAnimType;
 import com.avalon.base.gui.anim.ScrollAnim;
 import com.avalon.base.gui.panel.PanelHover;
@@ -15,6 +13,7 @@ import com.avalon.base.gui.theme.ModernTheme;
 import com.avalon.base.gui.theme.ThemedButton;
 import com.avalon.base.gui.theme.ThemedRadio;
 import com.avalon.base.gui.theme.ThemedToggle;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -75,24 +74,21 @@ public class AuthCmdScreen extends AvalonConfigScreen {
     // Red "click to remove" hint shown in a PanelHover box while a row is hovered.
     private String rowRemoveHint;
 
-    public AuthCmdScreen() {
-        this(null, false);
-    }
-
-    public AuthCmdScreen(Screen parent, boolean localEdit) {
-        super(Component.translatable("gui.authcmd.title"), parent, localEdit);
+    public AuthCmdScreen(Screen parent) {
+        // 主菜单（没有本地玩家）随时可编辑；世界内由基类按 OP 权限判定
+        super(Component.translatable("gui.authcmd.title"), parent, Minecraft.getInstance().player == null);
         // Ender Purple palette stays; the one-pixel button frame is drawn by
         // ButtonFrames after the widgets render (a wrapper theme would make
         // ThemedButton fall back to zero-alpha text color and hide labels).
         setTheme(new ModernTheme());
-        this.mode = AuthCmdConfig.mode;
-        this.showPauseButton = AuthCmdConfig.showPauseButton;
-        this.enableAnimations = AuthCmdConfig.enableAnimations;
-        this.allowEntitySelectors = AuthCmdConfig.allowEntitySelectors;
-        this.nonOpWhitelist.addAll(AuthCmdConfig.nonOpWhitelist);
-        this.opBlacklist.addAll(AuthCmdConfig.opBlacklist);
-        this.nonOpExempt.addAll(AuthCmdConfig.nonOpExempt);
-        this.opExempt.addAll(AuthCmdConfig.opExempt);
+        this.mode = AuthCmdConfig.mode();
+        this.showPauseButton = AuthCmdConfig.enableConfigEntry();
+        this.enableAnimations = AuthCmdConfig.enableAnimations();
+        this.allowEntitySelectors = AuthCmdConfig.allowEntitySelectors();
+        this.nonOpWhitelist.addAll(AuthCmdConfig.nonOpWhitelist());
+        this.opBlacklist.addAll(AuthCmdConfig.opBlacklist());
+        this.nonOpExempt.addAll(AuthCmdConfig.nonOpExempt());
+        this.opExempt.addAll(AuthCmdConfig.opExempt());
         // 开/关屏动画（AvalonBase 动画 API）：本屏选用「缩放弹跳」；开关关闭时完全无动画。
         // 在构造函数里配置 → 只在“打开本屏”时播放一次；模式切换导致的 init() 重入不会重播。
         configureAnimations(enableAnimations, ScreenAnimType.SCALE_BOUNCE, ScreenAnimType.SCALE_BOUNCE);
@@ -454,23 +450,10 @@ public class AuthCmdScreen extends AvalonConfigScreen {
     @Override
     protected void saveConfig() {
         if (!canEdit) return;
-        // Local edits (opened from the main-menu mod list) only persist to the local toml.
-        if (!localEdit && AvalonLink.isAvalonLoaded()) {
-            com.avalon.base.network.AvalonNetwork.sendToServer(NetworkChannels.UPDATE,
-                    new AuthCmdUpdatePacket(mode, allowEntitySelectors, showPauseButton, enableAnimations,
-                            nonOpWhitelist, opBlacklist, nonOpExempt, opExempt));
-        }
-        AuthCmdConfig.mode = mode;
-        AuthCmdConfig.allowEntitySelectors = allowEntitySelectors;
-        AuthCmdConfig.showPauseButton = showPauseButton;
-        AuthCmdConfig.enableAnimations = enableAnimations;
-        AuthCmdConfig.nonOpWhitelist = new ArrayList<>(nonOpWhitelist);
-        AuthCmdConfig.opBlacklist = new ArrayList<>(opBlacklist);
-        AuthCmdConfig.nonOpExempt = new ArrayList<>(nonOpExempt);
-        AuthCmdConfig.opExempt = new ArrayList<>(opExempt);
-        if (localEdit) {
-            AuthCmdConfig.save();
-        }
+        AuthCmdConfig.applyAndSave(mode, allowEntitySelectors, showPauseButton, enableAnimations,
+                nonOpWhitelist, opBlacklist, nonOpExempt, opExempt);
+        // 世界内：把改动推给服务端（单机即本机服务端）；主菜单外无连接时自动忽略
+        CamelotNet.sendUpdate(AuthCmdConfig.CONFIG);
     }
 
     // ─── 文案钩子（AuthCmd 自身语言键） ───
