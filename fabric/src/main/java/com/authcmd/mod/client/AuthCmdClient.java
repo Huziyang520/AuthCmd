@@ -1,6 +1,6 @@
 package com.authcmd.mod.client;
 
-import com.authcmd.mod.AvalonLink;
+import com.authcmd.mod.Constants;
 import com.authcmd.mod.config.AuthCmdConfig;
 import com.authcmd.mod.event.GuiEventHandler;
 import com.camelot.notice.JoinNotice;
@@ -18,12 +18,12 @@ public class AuthCmdClient implements ClientModInitializer {
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> onJoinWorld());
     }
 
-    /** 既没有 AvalonBase 也没有 Cloth 时提示玩家：可视化配置界面不可用。 */
+    /** 本机没有任何配置界面（未装 Cloth Config API）时提示一次。 */
     private static void onJoinWorld() {
-        if (AvalonLink.isAvalonLoaded() || ConfigScreens.clothAvailable()) {
+        if (ConfigScreens.available(Constants.MOD_ID)) {
             return;
         }
-        JoinNotice.show(Minecraft.getInstance().player, AuthCmdConfig.CONFIG, "show_tips",
+        JoinNotice.show(Minecraft.getInstance().player, AuthCmdConfig.CLIENT, "show_tips",
                 "message.authcmd.notice_config_ui");
     }
 }

@@ -1,5 +1,6 @@
 package com.authcmd.mod;
 
+import com.authcmd.mod.client.NeoForgeConfigScreens;
 import com.authcmd.mod.config.AuthCmdConfig;
 import com.authcmd.mod.event.ClientTreeResender;
 import com.authcmd.mod.event.CommandLogic;
@@ -7,6 +8,7 @@ import com.authcmd.mod.event.CommandTreeLogic;
 import com.authcmd.mod.event.GameModeLogic;
 import com.authcmd.mod.event.GuiEventHandler;
 import com.camelot.net.CamelotNet;
+import com.camelot.neoforge.NeoConfigs;
 import com.mojang.logging.LogUtils;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.IEventBus;
@@ -21,7 +23,7 @@ import org.slf4j.Logger;
 /**
  * AuthCmd NeoForge 入口。
  *
- * <p>配置读写、服务端下发与热加载由 Camelot 处理；26.x 无需 Dist，客户端事件直接注册
+ * <p>配置读写、界面、服务端下发与热加载由 Camelot 处理；26.x 无需 Dist，客户端事件直接注册
  * （服务端不会触发，无影响）。
  */
 @Mod(Constants.MOD_ID)
@@ -29,15 +31,14 @@ public class AuthCmdMod {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public AuthCmdMod(IEventBus modEventBus) {
-        AuthCmdConfig.init();
+        NeoConfigs.register(AuthCmdConfig.all());
         CamelotNet.register(AuthCmdConfig.CONFIG, ClientTreeResender::resendAll);
 
         NeoForge.EVENT_BUS.register(this);
         // 不能用 @Mod.EventBusSubscriber：mod 构造阶段会强制加载 GuiEventHandler，
-        // 进而解析其引用的 Avalon GUI 类型（未装 AvalonBase 时 NoClassDefFoundError）。
+        // 进而解析其引用的客户端 GUI 类型（未装 AvalonBase 时 NoClassDefFoundError）。
         GuiEventHandler.register();
-        // 模组列表 Config 按钮（原生 NeoForge 扩展点，Catalogue/Configured 同样认它）
-        com.authcmd.mod.client.NeoForgeConfigScreens.register();
+        NeoForgeConfigScreens.register();
 
         LOGGER.info("AuthCmd loaded!");
     }

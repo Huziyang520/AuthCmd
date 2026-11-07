@@ -32,5 +32,8 @@
   "message.authcmd.blocked_gamemode": "The administrator has disabled gamemode switching!",
   "message.authcmd.selector_blocked": "AuthCmd: Target selectors are not allowed!",
   "message.authcmd.notice_config_ui": "AuthCmd: The visual config screen requires AvalonBase or Cloth Config API. This notice can be disabled in the config screen or the config file.",
-  "authcmd.feedback": "Backup feedback address"
+  "authcmd.feedback": "Backup feedback address",
+  "gui.authcmd.scope.common": "Common",
+  "gui.authcmd.scope.client": "Client",
+  "gui.authcmd.show_tips": "Show tips"
 }

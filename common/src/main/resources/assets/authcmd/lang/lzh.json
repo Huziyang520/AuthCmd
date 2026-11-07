@@ -32,5 +32,8 @@
   "message.authcmd.blocked_gamemode": "司牧禁戲法之易！",
   "message.authcmd.selector_blocked": "AuthCmd：不許擇取標的！",
   "message.authcmd.notice_config_ui": "AuthCmd：可視之設置界面須裝AvalonBase或Cloth Config API；此告示可於設置界面或設置之卷中關之。",
-  "authcmd.feedback": "備用之奏報處"
+  "authcmd.feedback": "備用之奏報處",
+  "gui.authcmd.scope.common": "通用",
+  "gui.authcmd.scope.client": "客戶端",
+  "gui.authcmd.show_tips": "顯示提示"
 }

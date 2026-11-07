@@ -141,7 +141,7 @@ public final class CommandTreeLogic {
         public boolean test(CommandSourceStack source) {
             if (original != null && original.test(source)) return true;
 
-            AuthCmdConfig.CONFIG.reloadIfChanged();
+            AuthCmdConfig.CONFIG.reload();
             if (!isModeActive()) return false;
 
             for (String rootName : rootNames) {

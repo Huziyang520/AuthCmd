@@ -32,5 +32,8 @@
   "message.authcmd.blocked_gamemode": "管理員禁止使用遊戲模式切換！",
   "message.authcmd.selector_blocked": "AuthCmd: 不允許使用目標選擇器！",
   "message.authcmd.notice_config_ui": "AuthCmd：視覺化設定介面需要安裝 AvalonBase 或者 Cloth Config API；此提示可在設定介面或者設定檔中關閉。",
-  "authcmd.feedback": "備用回饋地址"
+  "authcmd.feedback": "備用回饋地址",
+  "gui.authcmd.scope.common": "通用",
+  "gui.authcmd.scope.client": "客戶端",
+  "gui.authcmd.show_tips": "顯示提示"
 }

@@ -3,16 +3,14 @@ package com.authcmd.mod.config;
 import com.camelot.config.CamelotConfig;
 import com.camelot.config.ConfigOption;
 import com.camelot.config.ConfigSchema;
+import com.camelot.config.ConfigScope;
 import com.camelot.net.CamelotNet;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * AuthCmd 指令权限配置（config/authcmd.toml）。
- *
- * <p>字段、默认值与文件顺序由 {@link #SCHEMA} 声明；读写、热加载、服务端下发与配置界面
- * 由 Camelot 按 schema 处理，本类只提供取值方法与判定逻辑。
+ * AuthCmd 指令权限配置：判定项在 {@code authcmd-common.toml}，本机偏好项在 {@code authcmd-client.toml}。
  *
  * <p>双套权限体系：
  * <ul>
@@ -31,7 +29,8 @@ public final class AuthCmdConfig {
     public static final String MODE_OP = "op_only";
     public static final String MODE_BOTH = "both";
 
-    public static final ConfigSchema SCHEMA = new ConfigSchema("authcmd", "authcmd.toml", "gui.authcmd.title",
+    public static final ConfigSchema COMMON_SCHEMA = new ConfigSchema("authcmd", ConfigScope.COMMON,
+            "gui.authcmd.title",
             List.of(
                     ConfigOption.select("mode", MODE_DISABLED,
                                     MODE_DISABLED, MODE_NON_OP, MODE_OP, MODE_BOTH)
@@ -41,18 +40,25 @@ public final class AuthCmdConfig {
                     ConfigOption.list("non_op_whitelist", List.of()),
                     ConfigOption.list("op_blacklist", List.of()),
                     ConfigOption.list("non_op_exempt", List.of()),
-                    ConfigOption.list("op_exempt", List.of()),
-                    ConfigOption.bool("enable_animations", true),
-                    ConfigOption.switchInt("show_tips", 1).clientOnly()));
+                    ConfigOption.list("op_exempt", List.of())));
 
-    public static final CamelotConfig CONFIG = new CamelotConfig(SCHEMA);
+    public static final ConfigSchema CLIENT_SCHEMA = new ConfigSchema("authcmd", ConfigScope.CLIENT,
+            "gui.authcmd.title",
+            List.of(
+                    ConfigOption.bool("enable_animations", true),
+                    ConfigOption.switchInt("show_tips", 1)));
+
+    /** 服务端下发、全局生效的配置。 */
+    public static final CamelotConfig CONFIG = new CamelotConfig(COMMON_SCHEMA);
+
+    /** 只影响本机的配置，不参与同步。 */
+    public static final CamelotConfig CLIENT = new CamelotConfig(CLIENT_SCHEMA);
 
     private AuthCmdConfig() {
     }
 
-    /** 服务端与客户端各读一次本地文件；联机客户端之后以服务端下发的值为准。 */
-    public static void init() {
-        CONFIG.load();
+    public static CamelotConfig[] all() {
+        return new CamelotConfig[]{CONFIG, CLIENT};
     }
 
     // ─── 取值 ───
@@ -71,7 +77,7 @@ public final class AuthCmdConfig {
     }
 
     public static boolean enableAnimations() {
-        return CONFIG.getBool("enable_animations");
+        return CLIENT.getBool("enable_animations");
     }
 
     /** 功能一：非OP指令白名单（提权）。 */
@@ -101,12 +107,14 @@ public final class AuthCmdConfig {
         CONFIG.set("mode", newMode);
         CONFIG.set("allow_entity_selectors", selectors);
         CONFIG.set("enable_config_entry", entry);
-        CONFIG.set("enable_animations", animations);
         CONFIG.set("non_op_whitelist", new ArrayList<>(whitelist));
         CONFIG.set("op_blacklist", new ArrayList<>(blacklist));
         CONFIG.set("non_op_exempt", new ArrayList<>(nonOpExempts));
         CONFIG.set("op_exempt", new ArrayList<>(opExempts));
         CONFIG.save();
+
+        CLIENT.set("enable_animations", animations);
+        CLIENT.save();
     }
 
     /** 客户端是否已收到过服务端下发的配置；未收到时不应按本地默认值做否定判定。 */

@@ -23,16 +23,16 @@ Four modes are available: **disabled**, **non-OP whitelist only**, **OP blacklis
 ## Quick start
 
 1. Put the mod file into your server's `mods` folder (Fabric or NeoForge).
-2. Start the server once. The config file `config/authcmd.toml` is created automatically.
+2. Start the server once. `config/authcmd-common.toml` and `config/authcmd-client.toml` are created automatically.
 3. Either edit that file, or use the in-game editor (see below).
 4. Pick a mode, fill in the command list and the exemption list, save.
 
 ## The in-game editor
 
-- Open it from the **mod list** → *AuthCmd* → *Config*, or from the **pause menu** (that button exists only with **AvalonBase** installed).
-- The mod-list screen is generated from the config schema and needs **Cloth Config API** on the client; with **AvalonBase** installed, the pause-menu button opens AvalonBase's own editor. Without either library the mod still works — you just edit the config file by hand.
-  - Cloth Config API: <https://www.curseforge.com/minecraft/mc-mods/cloth-config>
-  - AvalonBase: <https://www.curseforge.com/minecraft/mc-mods/avalonbase>
+- Two separate entry points, independent of each other:
+
+- **Mod list** → *AuthCmd* → *Config*: on NeoForge this is NeoForge's own configuration screen; on Fabric it is generated from the config schema and needs **Cloth Config API** (https://www.curseforge.com/minecraft/mc-mods/cloth-config). Without Cloth the button is simply unavailable — the mod still works, you just edit the files by hand.
+- **Pause menu** button: exists only with **AvalonBase** installed (https://www.curseforge.com/minecraft/mc-mods/avalonbase) and opens AvalonBase's own editor; on NeoForge it opens the NeoForge screen instead. It is not a stand-in for the mod-list entry.
 - Editing needs operator permission on the server; without it the screen is read-only. If the server owner turned the edit entry off, the mod-list entry shows a short "entry closed" notice and the pause button is gone.
 - The editor's *Interface* section contains an **Enable config entry** switch and an **Enable interface animations** switch (both on by default).
 
@@ -42,7 +42,24 @@ Blocked commands answer with a red `AuthCmd: This command has been disabled!`. B
 
 ## Config file
 
-`config/authcmd.toml` — the file is plain TOML and can be edited by hand at any time; changes are picked up **without restarting the server**.
+Two files, both plain TOML, safe to edit by hand at any time; changes are picked up **without restarting the server**.
+
+`config/authcmd-common.toml` — the rules, decided on the server and sent to clients:
+
+| Key | Meaning |
+|---|---|
+| `mode` | `disabled` / `non_op_only` / `op_only` / `both` |
+| `allow_entity_selectors` | Allow target selectors such as `@a` |
+| `enable_config_entry` | Allow entering the visual config screen (also shows the pause button) |
+| `non_op_whitelist` / `op_blacklist` | Commands granted / blocked in that domain |
+| `non_op_exempt` / `op_exempt` | Players immune to that domain |
+
+`config/authcmd-client.toml` — per-client preferences, never sent anywhere:
+
+| Key | Meaning |
+|---|---|
+| `enable_animations` | Interface open/close animations |
+| `show_tips` | `1` = show the in-game tip about the config screen |
 
 | Key | Meaning |
 |---|---|
@@ -98,16 +115,16 @@ AuthCmd 给服主提供两套互相独立的规则，外加一个共用行为：
 ## 快速开始
 
 1. 把模组文件放进服务端的 `mods` 文件夹（Fabric 或 NeoForge）。
-2. 启动一次服务端，会自动生成配置文件 `config/authcmd.toml`。
+2. 启动一次服务端，会自动生成 `config/authcmd-common.toml` 和 `config/authcmd-client.toml`。
 3. 直接改这个文件，或者用游戏内编辑界面（见下）。
 4. 选好模式、填好指令名单与豁免名单，保存即可。
 
 ## 游戏内编辑界面
 
-- 从**模组列表** → *AuthCmd* → *配置* 进入，或从**暂停菜单**的编辑按钮进入（该按钮只在装了 **AvalonBase** 时出现）。
-- 模组列表里的界面由配置项自动生成，需要客户端安装 **Cloth Config API**；装了 **AvalonBase** 时，暂停菜单按钮打开的是 AvalonBase 自己的界面。两者都没装也能正常使用，只是只能手改配置文件。
-  - Cloth Config API 下载：<https://www.curseforge.com/minecraft/mc-mods/cloth-config>
-  - AvalonBase 下载：<https://www.curseforge.com/minecraft/mc-mods/avalonbase>
+- 两个互相独立的入口：
+
+- **模组列表** → *AuthCmd* → *配置*：NeoForge 上就是 NeoForge 自带的配置界面；Fabric 上由配置项自动生成，需要客户端安装 **Cloth Config API**（https://www.curseforge.com/minecraft/mc-mods/cloth-config），没装时该按钮不可用，模组照常工作、只是只能手改文件。
+- **暂停菜单**按钮：只在装了 **AvalonBase**（https://www.curseforge.com/minecraft/mc-mods/avalonbase）时出现，打开的是 AvalonBase 自己的界面；NeoForge 上改为打开 NeoForge 的界面。它不是模组列表入口的替代品。
 - 编辑需要在服务端拥有管理员权限，否则界面只读；服主关闭编辑入口后，模组列表入口只显示一句"服务端关闭了可视化配置界面入口"，暂停菜单按钮也不再出现。
 - 界面的「界面设置」里有 **启用配置入口** 与 **启用动画效果** 两个开关（默认都开启）。
 
@@ -117,7 +134,24 @@ AuthCmd 给服主提供两套互相独立的规则，外加一个共用行为：
 
 ## 配置文件
 
-`config/authcmd.toml` —— 纯 TOML 文本，随时可以手改，**改动无需重启服务端**即可生效。
+两个文件都是纯 TOML 文本，随时可以手改，**改动无需重启服务端**即可生效。
+
+`config/authcmd-common.toml` —— 规则，由服务端判定并下发给客户端：
+
+| 键 | 含义 |
+|---|---|
+| `mode` | `disabled` / `non_op_only` / `op_only` / `both` |
+| `allow_entity_selectors` | 是否允许 `@a` 这类目标选择器 |
+| `enable_config_entry` | 是否允许进入可视化配置界面（也决定暂停菜单按钮是否出现） |
+| `non_op_whitelist` / `op_blacklist` | 对应功能域的放行 / 拦截指令名单 |
+| `non_op_exempt` / `op_exempt` | 对应功能域的豁免玩家 |
+
+`config/authcmd-client.toml` —— 只影响本机的偏好，不参与同步：
+
+| 键 | 含义 |
+|---|---|
+| `enable_animations` | 是否启用界面开/关动画 |
+| `show_tips` | `1` = 进世界时提示一次可视化配置界面的用法 |
 
 | 键 | 含义 |
 |---|---|
