@@ -1,5 +1,7 @@
 package com.authcmd.mod.gui.dialog;
 
+import com.camelot.ui.Screens;
+
 import com.authcmd.mod.config.AuthCmdConfig;
 import com.authcmd.mod.gui.ButtonFrames;
 import com.avalon.base.gui.anim.ScreenAnim;
@@ -97,7 +99,7 @@ abstract class EnderDialog extends Screen {
         if (closeDone) return; // 关闭动画收尾与 tick 可能同时到达，保证只切屏一次
         closeDone = true;
         if (minecraft != null) {
-            minecraft.setScreenAndShow(parentScreen);
+            Screens.open(parentScreen);
         }
     }
 

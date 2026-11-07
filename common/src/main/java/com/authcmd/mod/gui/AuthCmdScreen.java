@@ -1,5 +1,7 @@
 package com.authcmd.mod.gui;
 
+import com.camelot.ui.Screens;
+
 import com.authcmd.mod.config.AuthCmdConfig;
 import com.camelot.net.CamelotNet;
 import com.avalon.base.gui.anim.ScreenAnimType;
@@ -435,7 +437,7 @@ public class AuthCmdScreen extends AvalonConfigScreen {
         if (minecraft == null) return;
         playClickSound();
         List<String> target = command ? currentCommandList() : currentExemptList();
-        minecraft.setScreenAndShow(new AuthCmdAddDialog(this, command, target));
+        Screens.open(new AuthCmdAddDialog(this, command, target));
     }
 
     @Override

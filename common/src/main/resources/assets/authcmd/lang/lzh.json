@@ -41,5 +41,6 @@
   "gui.authcmd.mode_non_op_only": "非OP者之准籍",
   "gui.authcmd.mode_op_only": "OP者之禁籍",
   "gui.authcmd.mode_both": "二者並行",
-  "gui.authcmd.show_pause_button": "開設置之門"
+  "gui.authcmd.show_pause_button": "開設置之門",
+  "gui.authcmd.hint.local_only": "若汝無權改伺服之設，所改者為本機之設。"
 }

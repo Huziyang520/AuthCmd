@@ -1,5 +1,7 @@
 package com.authcmd.mod.gui;
 
+import com.camelot.ui.Screens;
+
 import com.avalon.base.gui.anim.ScreenAnim;
 import com.avalon.base.gui.anim.ScreenAnimType;
 import com.avalon.base.gui.theme.GuiTheme;
@@ -191,7 +193,7 @@ public class AuthCmdAddDialog extends Screen {
     private void backToParent() {
         if (closeDone) return;
         closeDone = true;
-        minecraft.setScreenAndShow(parent);
+        Screens.open(parent);
     }
 
     @Override

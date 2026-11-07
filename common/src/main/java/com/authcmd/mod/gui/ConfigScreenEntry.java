@@ -4,6 +4,7 @@ import com.authcmd.mod.AvalonLink;
 import com.authcmd.mod.Constants;
 import com.authcmd.mod.config.AuthCmdConfig;
 import com.camelot.ui.ConfigScreens;
+import com.camelot.ui.Screens;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -38,7 +39,7 @@ public final class ConfigScreenEntry {
     public static void openAvalonScreen() {
         Screen screen = avalonScreen(null);
         if (screen != null) {
-            Minecraft.getInstance().setScreenAndShow(screen);
+            Screens.open(screen);
         }
     }
 

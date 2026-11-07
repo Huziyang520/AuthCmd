@@ -4,6 +4,7 @@ import com.authcmd.mod.Constants;
 import com.authcmd.mod.config.AuthCmdConfig;
 import com.authcmd.mod.gui.PauseScreenButton;
 import com.camelot.ui.ConfigScreens;
+import com.camelot.ui.Screens;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.resources.Identifier;
@@ -40,7 +41,7 @@ public class GuiEventHandler {
                 () -> {
                     var screen = ConfigScreens.create(Constants.MOD_ID, null);
                     if (screen != null) {
-                        Minecraft.getInstance().setScreenAndShow(screen);
+                        Screens.open(screen);
                     }
                 }));
     }

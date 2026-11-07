@@ -41,5 +41,6 @@
   "gui.authcmd.mode_non_op_only": "非OP玩家指令白名單",
   "gui.authcmd.mode_op_only": "OP玩家指令黑名單",
   "gui.authcmd.mode_both": "同時開啟",
-  "gui.authcmd.show_pause_button": "啟用設定入口"
+  "gui.authcmd.show_pause_button": "啟用設定入口",
+  "gui.authcmd.hint.local_only": "若你沒有編輯伺服端配置的權限，你編輯的是本機的配置。"
 }
