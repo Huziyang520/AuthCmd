@@ -3,11 +3,6 @@ package com.authcmd.mod.gui.dialog;
 import com.avalon.base.gui.theme.ModernTheme;
 import com.avalon.base.gui.theme.Palette;
 
-/**
- * Local "Ender Blue" palette and theme used only by AuthCmd's standalone
- * dialogs. Built entirely from AvalonBase's public theme API
- * ({@link Palette#builder()} + {@link ModernTheme}); no AvalonBase class is
- */
 final class EnderBlue {
 
     static final Palette PALETTE = Palette.builder()
@@ -38,7 +33,6 @@ final class EnderBlue {
             .warn(0xFFE05555)
             .build();
 
-    /** Buttons use this real ModernTheme instance so their labels resolve btnText correctly. */
     static final ModernTheme THEME = new ModernTheme(PALETTE);
 
     private EnderBlue() {

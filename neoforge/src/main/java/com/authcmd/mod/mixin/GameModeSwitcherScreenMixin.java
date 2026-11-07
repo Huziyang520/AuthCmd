@@ -10,11 +10,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-/**
- * NeoForge client: lets non-operators pick a mode in the F3+F4 switcher by sending the game mode packet.
- * <p>1.21.11 reworked the vanilla permission check and removed {@code LocalPlayer.hasPermissions(int)};
- * {@code GameModeSwitcherScreen.switchToHoveredGameMode} no longer sends a {@code /gamemode} command,
- */
 @Mixin(GameModeSwitcherScreen.class)
 public class GameModeSwitcherScreenMixin {
 

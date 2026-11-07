@@ -9,14 +9,8 @@ import com.camelot.net.CamelotNet;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * AuthCmd command permission config: rules in {@code authcmd-common.toml}, preferences in {@code authcmd-client.toml}.
- * <p>Two permission domains:
- * players in {@code non_op_exempt} are fully exempt.</li>
- */
 public final class AuthCmdConfig {
 
-    /** Active mode; constants are the values written to the file and the labels of the cycle button. */
     public enum Mode {
         disabled,
         non_op_only,
@@ -46,10 +40,8 @@ public final class AuthCmdConfig {
                     ConfigOption.bool("enable_animations", true),
                     ConfigOption.switchInt("show_tips", 1)));
 
-    /** Synced, server-wide config. */
     public static final CamelotConfig CONFIG = new CamelotConfig(COMMON_SCHEMA);
 
-    /** Local-only config, never synced. */
     public static final CamelotConfig CLIENT = new CamelotConfig(CLIENT_SCHEMA);
 
     private AuthCmdConfig() {
@@ -59,8 +51,6 @@ public final class AuthCmdConfig {
         return new CamelotConfig[]{CONFIG, CLIENT};
     }
 
-    // values
-
     public static String mode() {
         return CONFIG.getString("mode");
     }
@@ -69,7 +59,6 @@ public final class AuthCmdConfig {
         return CONFIG.getBool("allow_entity_selectors");
     }
 
-    /** Config entry switch: when off the pause button disappears and the entry shows a closed notice. */
     public static boolean enableConfigEntry() {
         return CONFIG.getBool("enable_config_entry");
     }
@@ -78,27 +67,22 @@ public final class AuthCmdConfig {
         return CLIENT.getBool("enable_animations");
     }
 
-    /** Domain one: non-operator command whitelist (elevation). */
     public static List<String> nonOpWhitelist() {
         return CONFIG.getList("non_op_whitelist");
     }
 
-    /** Domain two: operator command blacklist (restriction). */
     public static List<String> opBlacklist() {
         return CONFIG.getList("op_blacklist");
     }
 
-    /** Domain one: non-operator exempt players. */
     public static List<String> nonOpExempt() {
         return CONFIG.getList("non_op_exempt");
     }
 
-    /** Domain two: operator exempt players. */
     public static List<String> opExempt() {
         return CONFIG.getList("op_exempt");
     }
 
-    /** Written back by the screen: applies immediately and persists (a server may override it later). */
     public static void applyAndSave(String newMode, boolean selectors, boolean entry, boolean animations,
                                     List<String> whitelist, List<String> blacklist,
                                     List<String> nonOpExempts, List<String> opExempts) {
@@ -115,17 +99,10 @@ public final class AuthCmdConfig {
         CLIENT.save();
     }
 
-    /** Whether the client already received the server config; local defaults must not decide before that. */
     public static boolean isClientConfigSynced() {
         return CamelotNet.isSynced("authcmd");
     }
 
-    // decisions
-
-    /**
-     * /**
-     * Resolves which domain applies to this player for the current command.
-     */
     public static int resolveDomain(boolean isOp) {
         String mode = mode();
         if (MODE_DISABLED.equals(mode)) return 0;
@@ -135,43 +112,30 @@ public final class AuthCmdConfig {
         return 0;
     }
 
-    /**
-     * /**
-     * Whether this player is fully exempt inside their domain.
-     */
     public static boolean isExempt(int domain, String playerName) {
         if (domain == 1) return nonOpExempt().contains(playerName);
         if (domain == 2) return opExempt().contains(playerName);
         return false;
     }
 
-    /**
-     * /**
-     * Whether this command should be blocked inside the given domain.
-     */
     public static boolean shouldBlockCommand(int domain, String commandName) {
         if (commandName == null) return false;
         String norm = normalizeCommand(commandName);
         if (domain == 1) {
-            // Domain one (whitelist): anything outside the list is blocked, using normalized matching
+
             return !containsNormalized(nonOpWhitelist(), norm);
         }
         if (domain == 2) {
-            // Domain two (blacklist): a hit is blocked, using normalized matching
+
             return containsNormalized(opBlacklist(), norm);
         }
         return false;
     }
 
-    /** Whether the list holds an entry equal to the normalized name (slash dropped, lowercase, first word). */
     private static boolean containsNormalized(List<String> list, String norm) {
         return containsNormalized(list, norm, false);
     }
 
-    /**
-     * /**
-     * Whether the list holds an entry equal to the given normalized name.
-     */
     public static boolean containsNormalized(List<String> list, String norm, boolean gamemodeAliases) {
         if (list == null || list.isEmpty()) return false;
         for (String entry : list) {
@@ -182,18 +146,10 @@ public final class AuthCmdConfig {
         return false;
     }
 
-    /**
-     * /**
-     * Whether this command is allowed inside the given domain.
-     */
     public static boolean isAllowed(int domain, String commandName) {
         return !shouldBlockCommand(domain, commandName);
     }
 
-    /**
-     * /**
-     * Whether gamemode/g, two aliases of one command, are allowed as a whole inside the given domain.
-     */
     public static boolean isGamemodeAllowed(int domain) {
         if (domain == 1) {
             for (String entry : nonOpWhitelist()) {
@@ -210,12 +166,10 @@ public final class AuthCmdConfig {
         return true;
     }
 
-    /** Whether the normalized name is {@code gamemode} or its alias {@code g}. */
     public static boolean isGamemodeCommand(String normalized) {
         return "gamemode".equals(normalized) || "g".equals(normalized);
     }
 
-    /** Normalizes a command name: drops a leading slash, lowercases, keeps the first word. */
     public static String normalizeCommand(String cmd) {
         if (cmd == null) return "";
         String c = cmd.trim();

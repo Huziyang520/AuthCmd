@@ -11,13 +11,11 @@ import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.common.NeoForge;
 
-/** AuthCmd NeoForge client: pause button opening the AvalonBase screen (absent without it). */
 public class GuiEventHandler {
 
     private static final Identifier BUTTON_TEXTURE =
             Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/button.png");
 
-    /** Called by the main entry during construction to register these listeners. */
     public static void register() {
         NeoForge.EVENT_BUS.addListener(GuiEventHandler::onScreenInit);
     }
@@ -37,7 +35,7 @@ public class GuiEventHandler {
         }
 
         int btnSize = 20;
-        // Only TP sits at the top right (x = screenWidth-25); this button goes 4px to its left so both fit
+
         int x = event.getScreen().width - btnSize * 2 - 9;
 
         event.addListener(PauseScreenButton.create(x, 5, btnSize, BUTTON_TEXTURE,

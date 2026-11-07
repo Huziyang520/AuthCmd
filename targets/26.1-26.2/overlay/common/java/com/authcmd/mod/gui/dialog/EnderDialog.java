@@ -15,11 +15,6 @@ import net.minecraft.network.chat.Component;
 
 import java.util.List;
 
-/**
- * Base for AuthCmd's standalone modal dialogs.
- * <p>Visual style mirrors the AvalonBase editor screens (dark backdrop,
- * gradient right-angle panel, centered title, wrapped body text) but the
- */
 abstract class EnderDialog extends Screen {
 
     protected static final int PANEL_W = 260;
@@ -42,7 +37,6 @@ abstract class EnderDialog extends Screen {
 
     private final Component bodyText;
 
-    /** 二级界面的开/关动画（默认「弹入」POP_ZOOM）；「启用动画效果」关闭时完全无动画。 */
     private final ScreenAnim anim;
     private boolean closeDone;
 
@@ -57,13 +51,10 @@ abstract class EnderDialog extends Screen {
         this.anim.playOpen();
     }
 
-    /** Minimum panel height regardless of the wrapped text length. */
     protected abstract int minPanelH();
 
-    /** Height of everything below the wrapped body text (gaps, rows, buttons, padding). */
     protected abstract int bottomHeight();
 
-    /** Register buttons after the panel geometry has been computed. */
     protected abstract void addDialogWidgets();
 
     @Override
@@ -76,12 +67,10 @@ abstract class EnderDialog extends Screen {
         addDialogWidgets();
     }
 
-    /** Absolute Y of the single button row at the bottom of the panel. */
     protected int buttonsY() {
         return top + panelH - BOTTOM_PAD - BTN_H;
     }
 
-    /** Create and register a bottom-row dialog button. */
     protected ThemedButton addDialogButton(int x, int w, Component label,
                                            GuiTheme.ButtonRole role, Button.OnPress onPress) {
         ThemedButton btn = new ThemedButton(x, buttonsY(), w, BTN_H, label, onPress, theme, role, font);
@@ -89,29 +78,23 @@ abstract class EnderDialog extends Screen {
         return btn;
     }
 
-    /** Extra content drawn between the body text and the buttons (e.g. a checkbox row). */
     protected void renderDialogContents(GuiGraphicsExtractor g, int mouseX, int mouseY) {
     }
 
     protected void backToParent() {
-        if (closeDone) return; // 关闭动画收尾与 tick 可能同时到达，保证只切屏一次
+        if (closeDone) return;
         closeDone = true;
         if (minecraft != null) {
             minecraft.setScreenAndShow(parentScreen);
         }
     }
 
-    /**
-     * /**
-     * 背景通道：交给原版（主菜单 = 全景图 + 模糊 + 菜单背景贴图；世界内 = 模糊 + 半透明暗底）。
-     */
     @Override
     public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
-        // 防闪（SKILL.md §10.28）：退场动画播完的那一帧，本屏不再绘制自己的背景，
-        // 并在背景阶段就交回父界面——否则本屏背景与父界面背景会叠在同一帧，看到一次跳变。
+
         anim.tick();
         if (anim.isClosing() && anim.isCloseFinished()) {
-            backToParent(); // 与本次 return 成对：不可只留一半
+            backToParent();
             return;
         }
         super.extractBackground(g, mouseX, mouseY, delta);
@@ -119,7 +102,7 @@ abstract class EnderDialog extends Screen {
 
     @Override
     public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
-        // 描边/命中都用动画坐标系（整块面板会被缩放，坐标必须跟着换）
+
         mouseX = (int) anim.localX(mouseX, width);
         mouseY = (int) anim.localY(mouseY, height);
         anim.beginFrame(g, width, height);
@@ -132,13 +115,12 @@ abstract class EnderDialog extends Screen {
         }
         renderDialogContents(g, mouseX, mouseY);
         super.extractRenderState(g, mouseX, mouseY, delta);
-        // Button frames on top of the widgets; ModernTheme is final and must stay
-        // the button theme so ThemedButton resolves the opaque btnText color.
+
         if (theme instanceof ModernTheme modern) {
             ButtonFrames.render(g, this, modern.palette());
         }
         anim.endFrame(g, width, height);
-        // 防闪（SKILL.md §10.28）：切父界面的动作已挪到背景方法的提前 return 分支，这里不再切屏
+
     }
 
     @Override
@@ -148,7 +130,7 @@ abstract class EnderDialog extends Screen {
 
     @Override
     public void onClose() {
-        // 有关闭动画 → 先播动画，播完再回父界面
+
         if (anim.beginClose()) return;
         backToParent();
     }

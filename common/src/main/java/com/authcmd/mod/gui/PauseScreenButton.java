@@ -6,19 +6,11 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
-/**
- * 暂停界面右上角的 AuthCmd 设置按钮（无文字、仅图标）。
- * <p>Fabric 与 Forge 的 {@code GuiEventHandler} 共用同一绘制逻辑（图标居中 blit），
- * 收敛为静态工厂避免各自复制匿名的 {@code Button} 子类。创建/挂载仍由各平台
- */
 public final class PauseScreenButton {
 
     private PauseScreenButton() {
     }
 
-    /**
-     * /**
-     */
     public static Button create(int x, int y, int size, Identifier texture, Runnable onClick) {
         return new Button(x, y, size, size, Component.empty(),
                 b -> onClick.run(), b -> Component.empty()) {

@@ -21,11 +21,6 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import org.slf4j.Logger;
 
-/**
- * AuthCmd NeoForge entry point.
- * <p>Config IO, screens, syncing and hot reload belong to Camelot; 26.x has no Dist, so client
- * events are registered directly and simply never fire on a server.
- */
 @Mod(Constants.MOD_ID)
 public class AuthCmdMod {
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -36,8 +31,7 @@ public class AuthCmdMod {
         CamelotNet.register(AuthCmdConfig.CONFIG, ClientTreeResender::resendAll);
 
         NeoForge.EVENT_BUS.register(this);
-        // Avoids @Mod.EventBusSubscriber: the mod constructor would load GuiEventHandler and resolve
-        // its client GUI types, failing with NoClassDefFoundError without AvalonBase.
+
         GuiEventHandler.register();
         NeoForgeConfigScreens.register();
 
@@ -46,7 +40,7 @@ public class AuthCmdMod {
 
     @SubscribeEvent
     public void onRegisterCommands(RegisterCommandsEvent event) {
-        // Patches the command tree during registration so whitelisted commands complete and run for non-operators
+
         CommandTreeLogic.patch(event.getDispatcher().getRoot());
     }
 
@@ -68,7 +62,7 @@ public class AuthCmdMod {
     @SubscribeEvent
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
-            // Resends the command tree so clients follow the current whitelist
+
             ClientTreeResender.resend(player);
         }
     }

@@ -9,11 +9,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-/**
- * NeoForge server: allows the game mode packet sent by whitelisted non-operators.
- * <p>Since 1.21.11 the F3+F4 switcher sends {@code ServerboundChangeGameModePacket} instead of
- * a {@code /gamemode} command; the server side of {@link ServerGamePacketListenerImpl}
- */
 @Mixin(ServerGamePacketListenerImpl.class)
 public class ServerGamePacketListenerImplMixin {
 

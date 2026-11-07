@@ -22,18 +22,13 @@ import com.mojang.blaze3d.platform.cursor.CursorTypes;
 
 import java.util.List;
 
-/**
- * 二级输入弹窗：在主界面点击"新增"后弹出，用于向指令名单或豁免名单连续添加条目。
- * <p>弹窗内输入框常驻，打开时直接聚焦输入框（光标闪烁），可立即输入；
- * 点"添加"只清空输入框而不关闭弹窗，可连续输入多条；点"完成"或按 Esc 关闭弹窗并返回主界面。
- */
 public class AuthCmdAddDialog extends Screen {
 
     private static final int DIALOG_W = 220;
     private static final int DIALOG_H = 118;
 
     private final Screen parent;
-    private final boolean command; // true=添加指令，false=添加豁免玩家
+    private final boolean command;
     private final List<String> targetList;
 
     private GuiTheme theme;
@@ -41,7 +36,6 @@ public class AuthCmdAddDialog extends Screen {
     private ThemedButton addButton;
     private ThemedButton doneButton;
 
-    /** 二级弹窗的开/关动画（与主编辑界面同一类型）；「启用动画效果」关闭时完全无动画。 */
     private final ScreenAnim anim;
     private boolean closeDone;
 
@@ -84,14 +78,9 @@ public class AuthCmdAddDialog extends Screen {
         addRenderableWidget(addButton);
         addRenderableWidget(doneButton);
 
-        // 打开弹窗时立即聚焦输入框：确保光标闪烁并可直接键入
         focusInput();
     }
 
-    /**
-     * /**
-     * 聚焦输入框。EditBox 光标闪烁依赖 {@link EditBox#isFocused()} 为 true 且 {@link #tick()} 持续刷新。
-     */
     private void focusInput() {
         setInitialFocus(input);
         input.setFocused(true);
@@ -124,14 +113,13 @@ public class AuthCmdAddDialog extends Screen {
 
     @Override
     public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
-        // 背景通道交给原版（主菜单 = 全景图 + 模糊 + 菜单背景贴图；世界内 = 模糊 + 半透明暗底）。
-        // 它同样位于动画变换之外，动画期间整屏始终是暗的，不会出现"弹窗变小、四周露出一圈更亮"的分层。
+
         super.extractBackground(g, mouseX, mouseY, partialTick);
     }
 
     @Override
     public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
-        // 动画：命中测试用动画坐标系，位姿变换只作用于弹窗本体
+
         mouseX = (int) anim.localX(mouseX, width);
         mouseY = (int) anim.localY(mouseY, height);
         anim.beginFrame(g, width, height);
@@ -143,14 +131,10 @@ public class AuthCmdAddDialog extends Screen {
                 x + 14, y + 12, theme.labelColor(), false);
         super.extractRenderState(g, mouseX, mouseY, partialTick);
 
-        // Same one-pixel right-angle button frames as the editor screen.
         if (theme instanceof ModernTheme modern) {
             ButtonFrames.render(g, this, modern.palette());
         }
 
-        // ─── 光标：仅当鼠标真正悬停在按钮或输入框上才显示手形 ───
-        // 注意不能用 isHoveredOrFocused()：输入框始终处于聚焦状态（setFocused(true)），
-        // isFocused 恒为 true 会导致手形永不消失。这里一律改用"鼠标是否悬停"判断。
         boolean showHand = false;
         if (addButton.isHovered() && addButton.active) showHand = true;
         if (!showHand && doneButton.isHovered()) showHand = true;
@@ -161,10 +145,6 @@ public class AuthCmdAddDialog extends Screen {
         if (anim.isCloseFinished()) backToParent();
     }
 
-    /**
-     * /**
-     * 26.3 光标走 {@code GuiGraphicsExtractor.requestCursor(...)}（帧末统一 apply 到窗口），
-     */
     private void setCursor(GuiGraphicsExtractor g, boolean showHand) {
         if (showHand) g.requestCursor(CursorTypes.POINTING_HAND);
     }
@@ -173,7 +153,7 @@ public class AuthCmdAddDialog extends Screen {
     public boolean mouseClicked(MouseButtonEvent event, boolean param) {
         double mouseX = event.x();
         double mouseY = event.y();
-        // 点击输入框时聚焦，确保光标闪烁
+
         if (input.isMouseOver(mouseX, mouseY)) {
             focusInput();
         }
@@ -182,14 +162,13 @@ public class AuthCmdAddDialog extends Screen {
 
     @Override
     public boolean keyPressed(KeyEvent event) {
-        if (event.isConfirmation()) { // Enter / Numpad Enter (26.3 SDL scancodes)
+        if (event.isConfirmation()) {
             addEntry();
             return true;
         }
         return super.keyPressed(event);
     }
 
-    /** 真正切回父界面（有关闭动画时由动画播完后调用；幂等）。 */
     private void backToParent() {
         if (closeDone) return;
         closeDone = true;
@@ -198,7 +177,7 @@ public class AuthCmdAddDialog extends Screen {
 
     @Override
     public void onClose() {
-        // 有关闭动画 → 先播动画，播完再回父界面
+
         if (anim.beginClose()) return;
         backToParent();
     }
