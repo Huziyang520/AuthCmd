@@ -22,11 +22,8 @@ import java.util.List;
 
 /**
  * 二级输入弹窗：在主界面点击"新增"后弹出，用于向指令名单或豁免名单连续添加条目。
- *
  * <p>弹窗内输入框常驻，打开时直接聚焦输入框（光标闪烁），可立即输入；
  * 点"添加"只清空输入框而不关闭弹窗，可连续输入多条；点"完成"或按 Esc 关闭弹窗并返回主界面。
- * 目标名单（指令/豁免）在打开弹窗时以参数传入，弹窗只向该名单追加，不会混淆两类条目。
- * 鼠标悬停在按钮/输入框上时显示手形光标。
  */
 public class AuthCmdAddDialog extends Screen {
 
@@ -90,9 +87,8 @@ public class AuthCmdAddDialog extends Screen {
     }
 
     /**
+     * /**
      * 聚焦输入框。EditBox 光标闪烁依赖 {@link EditBox#isFocused()} 为 true 且 {@link #tick()} 持续刷新。
-     * {@code setInitialFocus} 仅登记初始焦点（由 Minecraft 在界面激活时统一处理），直接调用
-     * {@code setFocused(true)} 可确保立即生效。
      */
     private void focusInput() {
         setInitialFocus(input);
@@ -171,9 +167,8 @@ public class AuthCmdAddDialog extends Screen {
     }
 
     /**
+     * /**
      * 26.3 光标走 {@code GuiGraphicsExtractor.requestCursor(...)}（帧末统一 apply 到窗口），
-     * 直接调 {@code Window.selectCursor} 会在帧末被覆盖。仅在需要手形时请求，不要请求箭头，
-     * 否则会盖掉输入框等原版控件自己请求的光标。
      */
     private void setCursor(GuiGraphicsExtractor g, boolean showHand) {
         if (showHand) g.requestCursor(CursorTypes.POINTING_HAND);

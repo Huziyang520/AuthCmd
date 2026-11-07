@@ -35,5 +35,11 @@
   "authcmd.feedback": "備用回饋地址",
   "gui.authcmd.scope.common": "通用",
   "gui.authcmd.scope.client": "客戶端",
-  "gui.authcmd.show_tips": "顯示提示"
+  "gui.authcmd.show_tips": "顯示提示",
+  "gui.authcmd.mode_label": "模式選擇：",
+  "gui.authcmd.mode_disabled": "關閉模組功能",
+  "gui.authcmd.mode_non_op_only": "非OP玩家指令白名單",
+  "gui.authcmd.mode_op_only": "OP玩家指令黑名單",
+  "gui.authcmd.mode_both": "同時啟用",
+  "gui.authcmd.show_pause_button": "啟用設定入口"
 }

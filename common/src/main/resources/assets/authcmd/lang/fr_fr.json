@@ -32,5 +32,11 @@
   "message.authcmd.blocked_gamemode": "L'administrateur a désactivé le changement de mode de jeu !",
   "message.authcmd.selector_blocked": "AuthCmd: Les sélecteurs de cible ne sont pas autorisés !",
   "message.authcmd.notice_config_ui": "AuthCmd : L'écran de configuration visuel nécessite AvalonBase ou Cloth Config API. Cet avis peut être désactivé dans l'écran de configuration ou le fichier de configuration.",
-  "authcmd.feedback": "Adresse de retour alternative"
+  "authcmd.feedback": "Adresse de retour alternative",
+  "gui.authcmd.mode_label": "Mode :",
+  "gui.authcmd.mode_disabled": "Désactiver le mod",
+  "gui.authcmd.mode_non_op_only": "Liste blanche des commandes (non-OP)",
+  "gui.authcmd.mode_op_only": "Liste noire des commandes (OP)",
+  "gui.authcmd.mode_both": "Activer les deux",
+  "gui.authcmd.show_pause_button": "Activer l'accès à la configuration"
 }

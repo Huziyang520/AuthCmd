@@ -32,5 +32,11 @@
   "message.authcmd.blocked_gamemode": "管理者によりゲームモードの切り替えが禁止されています！",
   "message.authcmd.selector_blocked": "AuthCmd: ターゲットセレクターは使用できません！",
   "message.authcmd.notice_config_ui": "AuthCmd：視覚的な設定画面には AvalonBase または Cloth Config API が必要です。この通知は設定画面または設定ファイルで無効にできます。",
-  "authcmd.feedback": "予備のフィードバック先"
+  "authcmd.feedback": "予備のフィードバック先",
+  "gui.authcmd.mode_label": "モード：",
+  "gui.authcmd.mode_disabled": "Modを無効化",
+  "gui.authcmd.mode_non_op_only": "非OP：コマンドの許可リスト",
+  "gui.authcmd.mode_op_only": "OP：コマンドの禁止リスト",
+  "gui.authcmd.mode_both": "両方を有効化",
+  "gui.authcmd.show_pause_button": "設定入口を有効化"
 }

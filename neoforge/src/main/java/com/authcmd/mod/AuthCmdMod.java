@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 
 /**
  * AuthCmd NeoForge 入口。
- *
  * <p>配置读写、界面、服务端下发与热加载由 Camelot 处理；26.x 无需 Dist，客户端事件直接注册
  * （服务端不会触发，无影响）。
  */

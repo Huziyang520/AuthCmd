@@ -13,18 +13,15 @@ import org.slf4j.Logger;
 
 /**
  * 指令拦截核心业务逻辑（平台无关）。
- *
  * <p>双套权限体系：按玩家是否为 OP 解析到功能一（非OP白名单提权）或功能二（OP黑名单降权），
  * 命中豁免玩家则完全放行；否则按名单判定是否拦截。
- *
- * <p>入口：{@link #shouldCancel(ParseResults)}，Forge 的 CommandEvent 与 Fabric 的
- * CommandsMixin 均传入解析结果 {@code ParseResults} 使用。
  */
 public class CommandLogic {
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
     /**
+     * /**
      * Forge 侧入口：已有解析结果。
      */
     public static boolean shouldCancel(ParseResults<CommandSourceStack> parseResults) {
@@ -90,12 +87,8 @@ public class CommandLogic {
     }
 
     /**
+     * /**
      * 目标选择器开关关闭时，拒绝**含选择器**的提权指令。
-     *
-     * <p>只关客户端是不够的：服务端是"用全权限源提权执行"，选择器天然不受限。因此在提权之前
-     * 再拦一次，保证"关闭 = 真的不能用"。
-     *
-     * @return true 表示已拦截（并已提示玩家）
      */
     private static boolean deniesEntitySelector(String raw, ServerPlayer player) {
         if (AuthCmdConfig.allowEntitySelectors()) return false;
@@ -105,8 +98,8 @@ public class CommandLogic {
     }
 
     /**
+     * /**
      * 用权限4的命令源代非OP执行命令，使其能真正使用白名单指令。
-     * 参照 OnlyTP {@code CommandLogic.executeElevated} 的实现。
      */
     private static void executeElevated(ServerPlayer player, String command) {
         // 规范化命令字符串：去除多余前导 '/', 避免 performPrefixedCommand 重复加 '/' 导致解析失败

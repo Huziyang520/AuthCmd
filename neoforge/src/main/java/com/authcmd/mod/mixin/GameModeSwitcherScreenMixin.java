@@ -12,14 +12,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 /**
  * NeoForge 客户端：放行非OP在 F3+F4 切换器中选择模式（发送 {@code ServerboundChangeGameModePacket}）。
- *
  * <p>1.21.11 起原版权限判定重构，{@code LocalPlayer.hasPermissions(int)} 已被移除，
  * {@code GameModeSwitcherScreen.switchToHoveredGameMode} 不再发送 {@code /gamemode} 命令，
- * 而是直接发送 {@code ServerboundChangeGameModePacket}：
- * {@code if (GameModeCommand.PERMISSION_CHECK.check(player.permissions())) send(new ServerboundChangeGameModePacket(...))}
- * 此处将本次 {@code PERMISSION_CHECK.check(...)} 判定改为：在 {@link GameModeLogic#shouldAllowGameModeSwitcher}
- * 放行时返回 true，从而让非OP真正发包；
- * 包到服务端后由 {@link ServerGamePacketListenerImplMixin} 放行 + {@code GameModeLogic.shouldBlock} 统一把关。
  */
 @Mixin(GameModeSwitcherScreen.class)
 public class GameModeSwitcherScreenMixin {

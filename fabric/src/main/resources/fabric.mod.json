@@ -43,11 +43,6 @@
     "custom": {
         "catalogue": {
             "configFactory": "com.authcmd.mod.client.CatalogueConfigEntry"
-        },
-        "modmenu": {
-            "links": {
-                "authcmd.feedback": "https://issue.mengcai.online/"
-            }
         }
     }
 }

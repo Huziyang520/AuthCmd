@@ -35,5 +35,11 @@
   "authcmd.feedback": "Backup feedback address",
   "gui.authcmd.scope.common": "Common",
   "gui.authcmd.scope.client": "Client",
-  "gui.authcmd.show_tips": "Show tips"
+  "gui.authcmd.show_tips": "Show tips",
+  "gui.authcmd.mode_label": "Mode:",
+  "gui.authcmd.mode_disabled": "Disable Mod",
+  "gui.authcmd.mode_non_op_only": "Non-OP command whitelist",
+  "gui.authcmd.mode_op_only": "OP command blacklist",
+  "gui.authcmd.mode_both": "Enable Both",
+  "gui.authcmd.show_pause_button": "Enable config entry"
 }

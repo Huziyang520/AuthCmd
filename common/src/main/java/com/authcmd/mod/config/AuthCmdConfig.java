@@ -11,18 +11,18 @@ import java.util.List;
 
 /**
  * AuthCmd 指令权限配置：判定项在 {@code authcmd-common.toml}，本机偏好项在 {@code authcmd-client.toml}。
- *
  * <p>双套权限体系：
- * <ul>
- *   <li><b>功能一（非OP）</b>：提权白名单 {@code non_op_whitelist}，名单内指令额外对非OP放行；
- *       豁免玩家 {@code non_op_exempt} 完全豁免。</li>
- *   <li><b>功能二（OP）</b>：降权黑名单 {@code op_blacklist}，名单内指令对OP拦截；
- *       豁免玩家 {@code op_exempt} 完全豁免。</li>
- * </ul>
- *
- * <p>生效范围 {@code mode}：disabled（全关闭，默认）/ non_op_only / op_only / both。
+ * 豁免玩家 {@code non_op_exempt} 完全豁免。</li>
  */
 public final class AuthCmdConfig {
+
+    /** 生效模式；常量名即配置文件里写的值，NeoForge 界面据此渲染成点击切换按钮。 */
+    public enum Mode {
+        disabled,
+        non_op_only,
+        op_only,
+        both
+    }
 
     public static final String MODE_DISABLED = "disabled";
     public static final String MODE_NON_OP = "non_op_only";
@@ -32,9 +32,7 @@ public final class AuthCmdConfig {
     public static final ConfigSchema COMMON_SCHEMA = new ConfigSchema("authcmd", ConfigScope.COMMON,
             "gui.authcmd.title",
             List.of(
-                    ConfigOption.select("mode", MODE_DISABLED,
-                                    MODE_DISABLED, MODE_NON_OP, MODE_OP, MODE_BOTH)
-                            .comment("mode: \"disabled\"  \"non_op_only\"  \"op_only\"  or  \"both\""),
+                    ConfigOption.select("mode", Mode.disabled),
                     ConfigOption.bool("allow_entity_selectors", true),
                     ConfigOption.bool("enable_config_entry", true).legacy("show_pause_button"),
                     ConfigOption.list("non_op_whitelist", List.of()),
@@ -125,9 +123,8 @@ public final class AuthCmdConfig {
     // ─── 判定方法 ───
 
     /**
+     * /**
      * 判断某玩家在本次命令执行中应走哪个功能域。
-     *
-     * @return 0=不约束；1=功能一（非OP白名单）；2=功能二（OP黑名单）
      */
     public static int resolveDomain(boolean isOp) {
         String mode = mode();
@@ -139,9 +136,8 @@ public final class AuthCmdConfig {
     }
 
     /**
+     * /**
      * 判断某玩家是否在其所属功能域内被完全豁免。
-     *
-     * @param domain 由 {@link #resolveDomain(boolean)} 得出：1=功能一，2=功能二
      */
     public static boolean isExempt(int domain, String playerName) {
         if (domain == 1) return nonOpExempt().contains(playerName);
@@ -150,9 +146,8 @@ public final class AuthCmdConfig {
     }
 
     /**
+     * /**
      * 判断指定命令名在指定功能域内是否应被拦截。
-     *
-     * @param domain 由 {@link #resolveDomain(boolean)} 得出：1=功能一，2=功能二
      */
     public static boolean shouldBlockCommand(int domain, String commandName) {
         if (commandName == null) return false;
@@ -174,9 +169,8 @@ public final class AuthCmdConfig {
     }
 
     /**
+     * /**
      * 判断列表是否存在规范化后与目标命令名相等的条目。
-     *
-     * @param gamemodeAliases 为 true 时，{@code gamemode}/{@code g} 视为同一命令的两个别名整体匹配
      */
     public static boolean containsNormalized(List<String> list, String norm, boolean gamemodeAliases) {
         if (list == null || list.isEmpty()) return false;
@@ -189,18 +183,16 @@ public final class AuthCmdConfig {
     }
 
     /**
+     * /**
      * 判断指定命令名在指定功能域内是否被允许（放行）。
-     *
-     * @param domain 由 {@link #resolveDomain(boolean)} 得出：1=功能一，2=功能二
      */
     public static boolean isAllowed(int domain, String commandName) {
         return !shouldBlockCommand(domain, commandName);
     }
 
     /**
+     * /**
      * 判断 gamemode/g（同一命令的两个别名）在指定功能域内是否被整体放行。
-     * <p>功能一（白名单）：两个别名任一在白名单即放行；
-     * 功能二（黑名单）：两个别名任一在黑名单即拦截。
      */
     public static boolean isGamemodeAllowed(int domain) {
         if (domain == 1) {

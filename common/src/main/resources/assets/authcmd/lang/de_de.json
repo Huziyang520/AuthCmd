@@ -32,5 +32,11 @@
   "message.authcmd.blocked_gamemode": "Der Administrator hat das Umschalten des Spielmodus deaktiviert!",
   "message.authcmd.selector_blocked": "AuthCmd: Ziel-Selektoren sind nicht erlaubt!",
   "message.authcmd.notice_config_ui": "AuthCmd: Die visuelle Konfigurationsoberfläche benötigt AvalonBase oder Cloth Config API. Dieser Hinweis lässt sich in der Oberfläche oder der Konfigurationsdatei abschalten.",
-  "authcmd.feedback": "Alternative Feedback-Adresse"
+  "authcmd.feedback": "Alternative Feedback-Adresse",
+  "gui.authcmd.mode_label": "Modus:",
+  "gui.authcmd.mode_disabled": "Mod deaktivieren",
+  "gui.authcmd.mode_non_op_only": "Befehls-Whitelist (Nicht-OP)",
+  "gui.authcmd.mode_op_only": "Befehls-Blacklist (OP)",
+  "gui.authcmd.mode_both": "Beides aktivieren",
+  "gui.authcmd.show_pause_button": "Konfigurationseintrag aktivieren"
 }

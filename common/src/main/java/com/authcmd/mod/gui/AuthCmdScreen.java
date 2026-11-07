@@ -25,10 +25,8 @@ import java.util.List;
 
 /**
  * AuthCmd 配置界面（双套指令权限控制器，仅末影紫主题）。
- *
  * <p>布局：生效范围 4 模式单选、显示暂停按钮开关、指令名单列表、豁免玩家列表、
  * 每个名单卡片带「新增」按钮（点击弹出 {@link AuthCmdAddDialog} 二级输入弹窗，可连续添加）、
- * 保存/取消。
  */
 public class AuthCmdScreen extends AvalonConfigScreen {
 
@@ -302,14 +300,7 @@ public class AuthCmdScreen extends AvalonConfigScreen {
                 // (rendered on top at the end of the frame) instead of inside the row,
                 // so it can never overlap long localized entry text.
                 rowRemoveHint = Component.translatable("gui.authcmd.click_to_remove").getString();
-                // ─────────────────────────────────────────────────────────────
-                // 备用方案：行内右对齐红字提示（悬停时直接绘制在名单行右侧）。
-                // 该方案作为备用方案，不得随意删除。
-                // String hint = Component.translatable("gui.authcmd.click_to_remove").getString();
-                // // 颜色必须带 FF 不透明 alpha（0xFFFF5555）；写成 0xFF5555 会被当作 ARGB → alpha=0 → 全透明不可见
-                // graphics.text(font, hint, cx + LIST_CARD_W - 8 - font.width(hint), y, 0xFFFF5555, false);
-                // ─────────────────────────────────────────────────────────────
-            }
+                }
             String text = TextFit.fit(font, list.get(idx), rowTextW);
             graphics.text(font, text, cx + 8, y, canEdit ? theme.textColor() : theme.disabledColor(), false);
         }

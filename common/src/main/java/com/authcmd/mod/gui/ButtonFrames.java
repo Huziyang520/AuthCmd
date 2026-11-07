@@ -7,13 +7,8 @@ import net.minecraft.client.gui.screens.Screen;
 
 /**
  * Screen-layer one-pixel right-angle frames for {@link ThemedButton}s.
- *
  * <p>The frame cannot be added by wrapping {@code GuiTheme}: AvalonBase's
  * ModernTheme is final and ThemedButton only reads btnText from an actual
- * ModernTheme instance, so a wrapper makes the fallback text color 0xFFFFFF
- * (zero alpha) and button labels render fully transparent. Keeping the real
- * ModernTheme as the button theme and outlining buttons here after the
- * widgets have rendered avoids touching AvalonBase.</p>
  */
 public final class ButtonFrames {
 

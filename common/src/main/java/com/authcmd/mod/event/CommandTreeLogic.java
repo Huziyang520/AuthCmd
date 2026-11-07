@@ -15,38 +15,16 @@ import java.util.function.Predicate;
 
 /**
  * 命令树权限放行逻辑（平台无关）。
- *
  * <p>背景：Minecraft 的指令树（Brigadier）中 {@code /gamemode} 等指令的 {@code requires}
  * 要求权限 2，非OP玩家在补全树过滤阶段就被剔除，导致本模组"非OP指令白名单"里的指令
- * 无法 Tab 补全。
- *
- * <p>实现：在命令注册阶段（Forge {@code RegisterCommandsEvent} / Fabric
- * {@code CommandRegistrationCallback}）用反射把每个节点的 {@code requirement} 换成动态谓词：
- * 原始 requires 通过则放行；否则当模式为 {@code non_op_only}/{@code both} 且该节点所属的
- * 根命令命中白名单时放行。动态谓词每次 {@code canUse} 都重新读白名单，因此增删白名单后
- * 只需重发命令树包即可生效，无需重新 patch。
- *
- * <p><b>别名（redirect）处理</b>：vanilla 用 {@code literal("tp").redirect(teleportNode)}
- * 实现别名，即 {@code /tp} 与 {@code /teleport} 共享同一棵子树。因此一个节点可能同时属于
- * 多个根命令，必须记录"可到达该节点的全部根命令名"，任一命中白名单即放行——否则白名单填
- * {@code tp} 时，共享子树因为先以 {@code teleport} 被登记而永远匹配不上，表现为
- * {@code /tp} 后面的参数全都补全不出来。
- *
- * <p>关于反射：Brigadier 库不参与混淆，{@code CommandNode.requirement} 在 Forge(MCP) 与
- * Fabric(Yarn) 下字段名一致，可安全定位；Java 17 下 {@code setAccessible(true)} 允许写入
- * 非静态 final 实例字段。
  */
 public final class CommandTreeLogic {
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
     /**
+     * /**
      * 节点 → 可到达该节点的全部根命令名（已规范化）。
-     * <p>按 identity 索引：Brigadier 节点的 equals 会比较子节点，用 identity 才能正确区分实例，
-     * 也才能阻断 redirect 造成的环。
-     * <p>value 用 {@link CopyOnWriteArraySet}：{@link WhitelistRequirement} 持有的是该集合的
-     * <b>引用</b>，后续别名遍历往里追加根命令名时，已建好的谓词会立刻看到新值；同时保证
-     * patch 与 canUse 万一并发时迭代不抛 {@code ConcurrentModificationException}。
      */
     private static final Map<CommandNode<CommandSourceStack>, Set<String>> NODE_ROOT_NAMES = new IdentityHashMap<>();
 
@@ -63,9 +41,8 @@ public final class CommandTreeLogic {
     }
 
     /**
+     * /**
      * 在命令注册完成后，为命令树的每个节点套上动态放行谓词。
-     *
-     * @param root 服务端命令树根节点（{@code dispatcher.getRoot()}）
      */
     public static void patch(CommandNode<CommandSourceStack> root) {
         if (root == null) {
@@ -96,10 +73,8 @@ public final class CommandTreeLogic {
     }
 
     /**
+     * /**
      * 递归为一棵子树登记根命令名并套上动态谓词。
-     *
-     * <p>终止条件是「(节点, 根命令名) 这一组合已处理过」而不是「节点已处理过」：
-     * 前者允许同一棵共享子树被第二个别名再遍历一次以补登记根命令名，同时仍能阻断环。
      */
     private static void patchTree(CommandNode<CommandSourceStack> node, String rootName) {
         String norm = AuthCmdConfig.normalizeCommand(rootName);
@@ -125,8 +100,8 @@ public final class CommandTreeLogic {
     }
 
     /**
+     * /**
      * 动态放行谓词。先走原始 requires 快路径（绝大多数节点在此返回，OP 与权限0命令都不会
-     * 触碰配置），仅当原始判定失败时才热加载配置并检查白名单。
      */
     private static final class WhitelistRequirement implements Predicate<CommandSourceStack> {
         private final Predicate<CommandSourceStack> original;
@@ -164,11 +139,8 @@ public final class CommandTreeLogic {
     }
 
     /**
+     * /**
      * 白名单命中判断。
-     * <p>{@code gamemode} 与 {@code g} 视为同一命令的两个别名整体判定，与
-     * {@code AuthCmdConfig.isGamemodeAllowed} 及 GameModeLogic 保持一致；
-     * 真正通过 redirect 实现的别名（tp/teleport 等）已由 {@link #NODE_ROOT_NAMES} 覆盖，
-     * 无需在此枚举。规范化逻辑统一复用 {@link AuthCmdConfig#normalizeCommand}。
      */
     static boolean isWhitelisted(String rootName) {
         String n = AuthCmdConfig.normalizeCommand(rootName);

@@ -17,17 +17,8 @@ import java.util.List;
 
 /**
  * Base for AuthCmd's standalone modal dialogs.
- *
  * <p>Visual style mirrors the AvalonBase editor screens (dark backdrop,
  * gradient right-angle panel, centered title, wrapped body text) but the
- * palette is the local Ender Blue one. Buttons are regular
- * {@link ThemedButton}s rendered by a real ModernTheme instance, and the
- * one-pixel right-angle frame is drawn on top by {@link ButtonFrames}
- * after the widgets render.</p>
- *
- * <p>Subclasses only declare the bottom area height, register their buttons
- * via {@link #addDialogButton} and optionally draw extra content via
- * {@link #renderDialogContents}.</p>
  */
 abstract class EnderDialog extends Screen {
 
@@ -111,9 +102,8 @@ abstract class EnderDialog extends Screen {
     }
 
     /**
+     * /**
      * 背景通道：交给原版（主菜单 = 全景图 + 模糊 + 菜单背景贴图；世界内 = 模糊 + 半透明暗底）。
-     * 旧实现整屏铺 {@code 0xC0101010} 近不透明深色，在主菜单里会把菜单背景整个盖住。
-     * 该背景位于动画变换之外，动画期间整屏始终是暗的，不会出现"弹窗变小、四周露出一圈更亮"的分层。
      */
     @Override
     public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {

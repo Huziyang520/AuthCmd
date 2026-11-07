@@ -35,5 +35,11 @@
   "authcmd.feedback": "備用之奏報處",
   "gui.authcmd.scope.common": "通用",
   "gui.authcmd.scope.client": "客戶端",
-  "gui.authcmd.show_tips": "顯示提示"
+  "gui.authcmd.show_tips": "顯示提示",
+  "gui.authcmd.mode_label": "擇法：",
+  "gui.authcmd.mode_disabled": "廢其模",
+  "gui.authcmd.mode_non_op_only": "非OP者之准籍",
+  "gui.authcmd.mode_op_only": "OP者之禁籍",
+  "gui.authcmd.mode_both": "二者並行",
+  "gui.authcmd.show_pause_button": "開設置之門"
 }

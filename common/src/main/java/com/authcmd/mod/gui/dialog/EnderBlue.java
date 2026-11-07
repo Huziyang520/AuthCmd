@@ -7,10 +7,6 @@ import com.avalon.base.gui.theme.Palette;
  * Local "Ender Blue" palette and theme used only by AuthCmd's standalone
  * dialogs. Built entirely from AvalonBase's public theme API
  * ({@link Palette#builder()} + {@link ModernTheme}); no AvalonBase class is
- * modified. The one-pixel button frame is added at the screen layer by
- * {@link com.authcmd.mod.gui.ButtonFrames}, because wrapping ModernTheme
- * (which is final) would make ThemedButton fall back to the zero-alpha
- * text color and render transparent labels.
  */
 final class EnderBlue {
 
