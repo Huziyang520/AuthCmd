@@ -11,9 +11,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 /**
- * Fabric 客户端：放行非OP在 F3+F4 切换器中选择模式（发送 {@code ServerboundChangeGameModePacket}）。
- * <p>1.21.11 起原版权限判定重构，{@code LocalPlayer.hasPermissions(int)} 已被移除，
- * {@code GameModeSwitcherScreen.switchToHoveredGameMode} 不再发送 {@code /gamemode} 命令，
+ * Fabric client: lets non-operators pick a mode in the F3+F4 switcher by sending the game mode packet.
+ * <p>1.21.11 reworked the vanilla permission check and removed {@code LocalPlayer.hasPermissions(int)};
+ * {@code GameModeSwitcherScreen.switchToHoveredGameMode} no longer sends a {@code /gamemode} command,
  */
 @Mixin(GameModeSwitcherScreen.class)
 public class GameModeSwitcherScreenMixin {

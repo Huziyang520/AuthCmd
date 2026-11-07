@@ -14,9 +14,9 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.function.Predicate;
 
 /**
- * 命令树权限放行逻辑（平台无关）。
- * <p>背景：Minecraft 的指令树（Brigadier）中 {@code /gamemode} 等指令的 {@code requires}
- * 要求权限 2，非OP玩家在补全树过滤阶段就被剔除，导致本模组"非OP指令白名单"里的指令
+ * Command tree permission widening (platform-free).
+ * <p>Brigadier filters nodes by their {@code requires} predicate while building the suggestion tree,
+ * so level-2 commands disappear for non-operators before the whitelist is consulted.
  */
 public final class CommandTreeLogic {
 
@@ -24,17 +24,17 @@ public final class CommandTreeLogic {
 
     /**
      * /**
-     * 节点 → 可到达该节点的全部根命令名（已规范化）。
+     * the node to every reachable root command name (normalized).
      */
     private static final Map<CommandNode<CommandSourceStack>, Set<String>> NODE_ROOT_NAMES = new IdentityHashMap<>();
 
-    /** 反射定位到的 requirement 字段（惰性初始化）。 */
+    /** Reflectively located requirement field, resolved lazily. */
     static Field requirementField;
 
-    /** 上次 patch 的根节点。服务端 reload 会重建命令树，根对象变化时清空缓存重新 patch。 */
+    /** Root of the last patch; a server reload rebuilds the tree, so a changed root triggers a re-patch. */
     private static CommandNode<CommandSourceStack> lastRoot;
 
-    /** 诊断：因白名单而放行的次数（仅前若干次打日志，避免刷屏）。 */
+    /** Diagnostics: how many commands were unblocked by the whitelist (logged a limited number of times). */
     private static volatile long grantCount = 0;
 
     private CommandTreeLogic() {
@@ -42,7 +42,7 @@ public final class CommandTreeLogic {
 
     /**
      * /**
-     * 在命令注册完成后，为命令树的每个节点套上动态放行谓词。
+     * After command registration, wraps every node's requirement with the dynamic pass-through predicate.
      */
     public static void patch(CommandNode<CommandSourceStack> root) {
         if (root == null) {
@@ -74,7 +74,7 @@ public final class CommandTreeLogic {
 
     /**
      * /**
-     * 递归为一棵子树登记根命令名并套上动态谓词。
+     * Walks a subtree, recording root command names and wrapping its predicates.
      */
     private static void patchTree(CommandNode<CommandSourceStack> node, String rootName) {
         String norm = AuthCmdConfig.normalizeCommand(rootName);
@@ -83,8 +83,8 @@ public final class CommandTreeLogic {
         Set<String> rootNames = NODE_ROOT_NAMES.computeIfAbsent(node, k -> new CopyOnWriteArraySet<>());
         if (!rootNames.add(norm)) return; // 该 (节点, 根命令名) 组合已处理
 
-        // 幂等：同一节点只包一层，避免动态谓词嵌套。
-        // 已包裹过的节点其谓词持有的正是上面这个 rootNames 集合，追加即生效。
+        // Idempotent: a node is wrapped once, so predicates never nest.
+        // An already wrapped node holds this very set, so appending a root name takes effect immediately.
         if (!(node.getRequirement() instanceof WhitelistRequirement)) {
             setRequirement(node, new WhitelistRequirement(node.getRequirement(), rootNames));
         }
@@ -93,7 +93,7 @@ public final class CommandTreeLogic {
             patchTree(child, norm);
         }
 
-        // 跟随 redirect：别名与 /execute 等重定向命令的目标子树同样需要登记本根命令名
+        // Follows redirects: alias and /execute targets need the same root command name registered
         if (node.getRedirect() != null) {
             patchTree(node.getRedirect(), norm);
         }
@@ -101,7 +101,7 @@ public final class CommandTreeLogic {
 
     /**
      * /**
-     * 动态放行谓词。先走原始 requires 快路径（绝大多数节点在此返回，OP 与权限0命令都不会
+     * Dynamic pass-through predicate. The original requirement is tried first, which is the fast path for
      */
     private static final class WhitelistRequirement implements Predicate<CommandSourceStack> {
         private final Predicate<CommandSourceStack> original;
@@ -132,7 +132,7 @@ public final class CommandTreeLogic {
         }
     }
 
-    /** 功能一（非OP白名单）是否在当前 mode 下生效。 */
+    /** Whether the whitelist domain is active in the current mode. */
     private static boolean isModeActive() {
         return AuthCmdConfig.MODE_NON_OP.equals(AuthCmdConfig.mode())
                 || AuthCmdConfig.MODE_BOTH.equals(AuthCmdConfig.mode());
@@ -140,7 +140,7 @@ public final class CommandTreeLogic {
 
     /**
      * /**
-     * 白名单命中判断。
+     * Whitelist hit test.
      */
     static boolean isWhitelisted(String rootName) {
         String n = AuthCmdConfig.normalizeCommand(rootName);
@@ -161,7 +161,7 @@ public final class CommandTreeLogic {
     private static Field findRequirementField() {
         if (requirementField != null) return requirementField;
         try {
-            // CommandNode.requirement 在两个加载器映射下字段名一致（Brigadier 库不混淆）
+            // Brigadier is not obfuscated, so the field name matches on both loaders
             requirementField = CommandNode.class.getDeclaredField("requirement");
             requirementField.setAccessible(true);
         } catch (NoSuchFieldException | RuntimeException e) {

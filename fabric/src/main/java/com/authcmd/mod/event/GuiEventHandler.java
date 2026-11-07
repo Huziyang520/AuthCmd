@@ -12,9 +12,9 @@ import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.resources.Identifier;
 
 /**
- * AuthCmd Fabric 客户端：在暂停界面注入配置按钮（AvalonBase 界面的唯一入口）。
- * <p>未安装 AvalonBase 时按钮不存在；界面类名一律在 {@link ConfigScreenEntry} 内反射创建，
- * 本类不引用任何 Avalon 类型。
+ * AuthCmd Fabric client: injects the config button into the pause screen (the only AvalonBase entry).
+ * <p>The button is absent without AvalonBase; screen classes are created reflectively in ConfigScreenEntry,
+ * so this class never references Avalon types.
  */
 public class GuiEventHandler {
 
@@ -27,12 +27,12 @@ public class GuiEventHandler {
             if (!AvalonLink.isAvalonLoaded()) return;
             if (Minecraft.getInstance().player == null) return;
 
-            // 本机是主机时按本机文件刷新，手改配置后无需重启即可反映到按钮
+            // Reloads from the local file when hosting, so manual edits reach the button without a restart
             if (Minecraft.getInstance().hasSingleplayerServer()) AuthCmdConfig.CONFIG.reload();
             if (!AuthCmdConfig.enableConfigEntry()) return;
 
             int btnSize = 20;
-            // OnlyTP 按钮在右上角（x = screenWidth-25），AuthCmd 按钮放在其正左侧，留 4px 间距，互不遮挡
+            // Only TP sits at the top right (x = screenWidth-25); this button goes 4px to its left so both fit
             int x = screen.width - btnSize * 2 - 9;
 
             ((ScreenAccessor) screen).authcmd$invokeAddRenderableWidget(

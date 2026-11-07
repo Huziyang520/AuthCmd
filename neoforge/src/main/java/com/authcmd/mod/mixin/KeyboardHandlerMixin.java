@@ -11,9 +11,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 /**
- * NeoForge 客户端：功能一启用且 {@code gamemode} 命中白名单时，允许非OP打开 F3+F4 游戏模式切换器。
- * <p>1.21.11 起原版权限判定重构，{@code LocalPlayer.hasPermissions(int)} 已被移除，
- * {@code handleDebugKeys} 中打开切换器分支改为：
+ * NeoForge client: allows non-operators to open the F3+F4 switcher when the whitelist domain is active.
+ * <p>1.21.11 reworked the vanilla permission check and removed {@code LocalPlayer.hasPermissions(int)};
+ * {@code handleDebugKeys} opens the switcher through this decision:
  */
 @Mixin(KeyboardHandler.class)
 public class KeyboardHandlerMixin {

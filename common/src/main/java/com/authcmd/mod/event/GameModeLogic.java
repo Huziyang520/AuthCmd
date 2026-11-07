@@ -10,9 +10,9 @@ import net.minecraft.world.level.GameType;
 import org.slf4j.Logger;
 
 /**
- * 游戏模式切换拦截业务逻辑（平台无关）。
- * <p>无独立开关：gamemode 拦截由指令限制自动带出。判断玩家所属功能域内
- * {@code gamemode}/{@code g} 是否应被拦截，是则回滚；豁免玩家不拦截。
+ * Game mode switching rules (platform-free).
+ * <p>No separate switch: gamemode blocking follows the command rules. Decides whether
+ * {@code gamemode}/{@code g} is blocked in the player's domain, rolling the change back; exempt players pass.
  */
 public class GameModeLogic {
 
@@ -20,7 +20,7 @@ public class GameModeLogic {
 
     /**
      * /**
-     * 判断是否应拦截本次游戏模式切换。
+     * Whether this game mode change should be blocked.
      */
     public static boolean shouldBlock(ServerPlayer player, GameType oldGameMode) {
         boolean isOp = player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER);
@@ -29,11 +29,11 @@ public class GameModeLogic {
                 player.getName().getString(), isOp, domain, oldGameMode, AuthCmdConfig.nonOpWhitelist());
         if (domain == 0) return false; // 不在受约束功能域
 
-        // 豁免玩家 → 完全放行
+        // Exempt player passes through
         if (AuthCmdConfig.isExempt(domain, player.getName().getString())) return false;
 
-        // gamemode/g 作为同一命令的两个别名整体判定：
-        // 功能一（白名单）：任一别名在白名单即放行；功能二（黑名单）：任一别名在黑名单即拦截
+        // gamemode/g are judged as one command with two aliases:
+        // whitelist: any alias listed is allowed; blacklist: any alias listed is blocked
         boolean allowed = AuthCmdConfig.isGamemodeAllowed(domain);
         LOGGER.info("[AuthCmd] shouldBlock gamemodeAllowed={}", allowed);
         if (!allowed) {
@@ -45,7 +45,7 @@ public class GameModeLogic {
 
     /**
      * /**
-     * 判定是否应放行非OP通过 F3+F4 游戏模式切换器切换游戏模式。
+     * Whether a non-operator may use the F3+F4 game mode switcher.
      */
     public static boolean shouldAllowGameModeChange(Player player) {
         if (player == null) return false;
@@ -59,7 +59,7 @@ public class GameModeLogic {
 
     /**
      * /**
-     * 客户端 F3+F4 切换器入口/发包的放行判定（<b>严格</b>，2026-10-07 口径修正）。
+     * Client F3+F4 switcher decision (<b>strict</b>).
      */
     public static boolean shouldAllowGameModeSwitcher(Player player) {
         return shouldAllowGameModeChange(player);
@@ -67,7 +67,7 @@ public class GameModeLogic {
 
     /**
      * /**
-     * 客户端 F3+F4 切换器两处 {@code LocalPlayer.hasPermissions(int)} 的通用放行判定。
+     * Shared decision for the two {@code LocalPlayer.hasPermissions(int)} checks of the F3+F4 switcher.
      */
     public static boolean allowHasPermissions(Player player, int permissionLevel) {
         if (shouldAllowGameModeSwitcher(player)) return true;

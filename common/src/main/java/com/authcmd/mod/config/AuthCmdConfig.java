@@ -10,13 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * AuthCmd 指令权限配置：判定项在 {@code authcmd-common.toml}，本机偏好项在 {@code authcmd-client.toml}。
- * <p>双套权限体系：
- * 豁免玩家 {@code non_op_exempt} 完全豁免。</li>
+ * AuthCmd command permission config: rules in {@code authcmd-common.toml}, preferences in {@code authcmd-client.toml}.
+ * <p>Two permission domains:
+ * players in {@code non_op_exempt} are fully exempt.</li>
  */
 public final class AuthCmdConfig {
 
-    /** 生效模式；常量名即配置文件里写的值，NeoForge 界面据此渲染成点击切换按钮。 */
+    /** Active mode; constants are the values written to the file and the labels of the cycle button. */
     public enum Mode {
         disabled,
         non_op_only,
@@ -46,10 +46,10 @@ public final class AuthCmdConfig {
                     ConfigOption.bool("enable_animations", true),
                     ConfigOption.switchInt("show_tips", 1)));
 
-    /** 服务端下发、全局生效的配置。 */
+    /** Synced, server-wide config. */
     public static final CamelotConfig CONFIG = new CamelotConfig(COMMON_SCHEMA);
 
-    /** 只影响本机的配置，不参与同步。 */
+    /** Local-only config, never synced. */
     public static final CamelotConfig CLIENT = new CamelotConfig(CLIENT_SCHEMA);
 
     private AuthCmdConfig() {
@@ -59,7 +59,7 @@ public final class AuthCmdConfig {
         return new CamelotConfig[]{CONFIG, CLIENT};
     }
 
-    // ─── 取值 ───
+    // values
 
     public static String mode() {
         return CONFIG.getString("mode");
@@ -69,7 +69,7 @@ public final class AuthCmdConfig {
         return CONFIG.getBool("allow_entity_selectors");
     }
 
-    /** 配置入口开关：关闭后暂停界面无按钮，世界内进入入口显示"服务端已关闭"。 */
+    /** Config entry switch: when off the pause button disappears and the entry shows a closed notice. */
     public static boolean enableConfigEntry() {
         return CONFIG.getBool("enable_config_entry");
     }
@@ -78,27 +78,27 @@ public final class AuthCmdConfig {
         return CLIENT.getBool("enable_animations");
     }
 
-    /** 功能一：非OP指令白名单（提权）。 */
+    /** Domain one: non-operator command whitelist (elevation). */
     public static List<String> nonOpWhitelist() {
         return CONFIG.getList("non_op_whitelist");
     }
 
-    /** 功能二：OP指令黑名单（降权）。 */
+    /** Domain two: operator command blacklist (restriction). */
     public static List<String> opBlacklist() {
         return CONFIG.getList("op_blacklist");
     }
 
-    /** 功能一：非OP豁免玩家。 */
+    /** Domain one: non-operator exempt players. */
     public static List<String> nonOpExempt() {
         return CONFIG.getList("non_op_exempt");
     }
 
-    /** 功能二：OP豁免玩家。 */
+    /** Domain two: operator exempt players. */
     public static List<String> opExempt() {
         return CONFIG.getList("op_exempt");
     }
 
-    /** 界面保存后写回：立即生效并落盘（联机客户端随后由服务端下发覆盖）。 */
+    /** Written back by the screen: applies immediately and persists (a server may override it later). */
     public static void applyAndSave(String newMode, boolean selectors, boolean entry, boolean animations,
                                     List<String> whitelist, List<String> blacklist,
                                     List<String> nonOpExempts, List<String> opExempts) {
@@ -115,16 +115,16 @@ public final class AuthCmdConfig {
         CLIENT.save();
     }
 
-    /** 客户端是否已收到过服务端下发的配置；未收到时不应按本地默认值做否定判定。 */
+    /** Whether the client already received the server config; local defaults must not decide before that. */
     public static boolean isClientConfigSynced() {
         return CamelotNet.isSynced("authcmd");
     }
 
-    // ─── 判定方法 ───
+    // decisions
 
     /**
      * /**
-     * 判断某玩家在本次命令执行中应走哪个功能域。
+     * Resolves which domain applies to this player for the current command.
      */
     public static int resolveDomain(boolean isOp) {
         String mode = mode();
@@ -137,7 +137,7 @@ public final class AuthCmdConfig {
 
     /**
      * /**
-     * 判断某玩家是否在其所属功能域内被完全豁免。
+     * Whether this player is fully exempt inside their domain.
      */
     public static boolean isExempt(int domain, String playerName) {
         if (domain == 1) return nonOpExempt().contains(playerName);
@@ -147,30 +147,30 @@ public final class AuthCmdConfig {
 
     /**
      * /**
-     * 判断指定命令名在指定功能域内是否应被拦截。
+     * Whether this command should be blocked inside the given domain.
      */
     public static boolean shouldBlockCommand(int domain, String commandName) {
         if (commandName == null) return false;
         String norm = normalizeCommand(commandName);
         if (domain == 1) {
-            // 功能一（非OP，白名单）：未命中白名单 → 拦截（规范化匹配，与命令树补全放行逻辑一致）
+            // Domain one (whitelist): anything outside the list is blocked, using normalized matching
             return !containsNormalized(nonOpWhitelist(), norm);
         }
         if (domain == 2) {
-            // 功能二（OP，黑名单）：命中黑名单 → 拦截（规范化匹配）
+            // Domain two (blacklist): a hit is blocked, using normalized matching
             return containsNormalized(opBlacklist(), norm);
         }
         return false;
     }
 
-    /** 判断列表是否存在规范化后与目标命令名相等的条目（去 /、小写、取第一段）。 */
+    /** Whether the list holds an entry equal to the normalized name (slash dropped, lowercase, first word). */
     private static boolean containsNormalized(List<String> list, String norm) {
         return containsNormalized(list, norm, false);
     }
 
     /**
      * /**
-     * 判断列表是否存在规范化后与目标命令名相等的条目。
+     * Whether the list holds an entry equal to the given normalized name.
      */
     public static boolean containsNormalized(List<String> list, String norm, boolean gamemodeAliases) {
         if (list == null || list.isEmpty()) return false;
@@ -184,7 +184,7 @@ public final class AuthCmdConfig {
 
     /**
      * /**
-     * 判断指定命令名在指定功能域内是否被允许（放行）。
+     * Whether this command is allowed inside the given domain.
      */
     public static boolean isAllowed(int domain, String commandName) {
         return !shouldBlockCommand(domain, commandName);
@@ -192,7 +192,7 @@ public final class AuthCmdConfig {
 
     /**
      * /**
-     * 判断 gamemode/g（同一命令的两个别名）在指定功能域内是否被整体放行。
+     * Whether gamemode/g, two aliases of one command, are allowed as a whole inside the given domain.
      */
     public static boolean isGamemodeAllowed(int domain) {
         if (domain == 1) {
@@ -210,12 +210,12 @@ public final class AuthCmdConfig {
         return true;
     }
 
-    /** 规范化后的命令名是否为 {@code gamemode} 或其别名 {@code g}。 */
+    /** Whether the normalized name is {@code gamemode} or its alias {@code g}. */
     public static boolean isGamemodeCommand(String normalized) {
         return "gamemode".equals(normalized) || "g".equals(normalized);
     }
 
-    /** 规范化命令名：去前导 /、统一小写、只取空格前第一段。 */
+    /** Normalizes a command name: drops a leading slash, lowercases, keeps the first word. */
     public static String normalizeCommand(String cmd) {
         if (cmd == null) return "";
         String c = cmd.trim();

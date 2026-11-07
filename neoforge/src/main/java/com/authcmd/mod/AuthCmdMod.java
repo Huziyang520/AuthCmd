@@ -22,9 +22,9 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import org.slf4j.Logger;
 
 /**
- * AuthCmd NeoForge 入口。
- * <p>配置读写、界面、服务端下发与热加载由 Camelot 处理；26.x 无需 Dist，客户端事件直接注册
- * （服务端不会触发，无影响）。
+ * AuthCmd NeoForge entry point.
+ * <p>Config IO, screens, syncing and hot reload belong to Camelot; 26.x has no Dist, so client
+ * events are registered directly and simply never fire on a server.
  */
 @Mod(Constants.MOD_ID)
 public class AuthCmdMod {
@@ -36,8 +36,8 @@ public class AuthCmdMod {
         CamelotNet.register(AuthCmdConfig.CONFIG, ClientTreeResender::resendAll);
 
         NeoForge.EVENT_BUS.register(this);
-        // 不能用 @Mod.EventBusSubscriber：mod 构造阶段会强制加载 GuiEventHandler，
-        // 进而解析其引用的客户端 GUI 类型（未装 AvalonBase 时 NoClassDefFoundError）。
+        // Avoids @Mod.EventBusSubscriber: the mod constructor would load GuiEventHandler and resolve
+        // its client GUI types, failing with NoClassDefFoundError without AvalonBase.
         GuiEventHandler.register();
         NeoForgeConfigScreens.register();
 
@@ -46,7 +46,7 @@ public class AuthCmdMod {
 
     @SubscribeEvent
     public void onRegisterCommands(RegisterCommandsEvent event) {
-        // 命令注册阶段即 patch 命令树，放行非OP白名单指令的权限（使其可补全、可执行）
+        // Patches the command tree during registration so whitelisted commands complete and run for non-operators
         CommandTreeLogic.patch(event.getDispatcher().getRoot());
     }
 
@@ -68,7 +68,7 @@ public class AuthCmdMod {
     @SubscribeEvent
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
-            // 重发命令树，使客户端基于最新白名单获得正确的补全树
+            // Resends the command tree so clients follow the current whitelist
             ClientTreeResender.resend(player);
         }
     }

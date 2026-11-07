@@ -6,9 +6,9 @@ import net.minecraft.server.level.ServerPlayer;
 import org.slf4j.Logger;
 
 /**
- * 向客户端重发命令树（平台无关，纯 common 模块）。
- * <p>补全树（{@code ClientboundCommandsPacket}）由服务端在发送那一刻按各节点
- * {@code canUse(source)} 过滤生成。{@link CommandTreeLogic} 已把白名单命令节点的
+ * Resends the command tree to clients (platform-free, common module only).
+ * <p>The suggestion tree is filtered by each node's {@code canUse(source)} when the server sends it;
+ * CommandTreeLogic has already widened those predicates, so the tree rebuilt on resend
  */
 public final class ClientTreeResender {
 
@@ -17,7 +17,7 @@ public final class ClientTreeResender {
     private ClientTreeResender() {
     }
 
-    /** 为指定玩家重发客户端命令树（含白名单指令的补全）。 */
+    /** Resends the client command tree of one player, including whitelisted suggestions. */
     public static void resend(ServerPlayer player) {
         if (player == null) return;
         MinecraftServer server = player.level().getServer();
@@ -29,7 +29,7 @@ public final class ClientTreeResender {
         LOGGER.debug("[AuthCmd] Command tree resent to {}", player.getName().getString());
     }
 
-    /** 为全部在线玩家重发客户端命令树。 */
+    /** Resends the client command tree of every online player. */
     public static void resendAll(MinecraftServer server) {
         if (server == null) return;
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {

@@ -10,9 +10,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 /**
- * Fabric 服务端：放行功能一的非OP通过 F3+F4 切换器发送的 {@code ServerboundChangeGameModePacket}。
- * <p>1.21.11 起 F3+F4 切换器不再发送 {@code /gamemode} 命令，而是直接发送
- * {@code ServerboundChangeGameModePacket}；服务端 {@link ServerGamePacketListenerImpl}
+ * Fabric server: allows the game mode packet sent by whitelisted non-operators.
+ * <p>Since 1.21.11 the F3+F4 switcher sends {@code ServerboundChangeGameModePacket} instead of
+ * a {@code /gamemode} command; the server side of {@link ServerGamePacketListenerImpl}
  */
 @Mixin(ServerGamePacketListenerImpl.class)
 public class ServerGamePacketListenerImplMixin {

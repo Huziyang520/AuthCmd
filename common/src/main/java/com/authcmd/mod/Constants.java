@@ -4,8 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * AuthCmd 模组全局常量。
- * mod_id 为 authcmd，作为独立模组可单独安装，依赖前置模组 avalonbase。
+ * AuthCmd mod constants.
+ * mod_id is authcmd; it installs standalone and depends on avalonbase.
  */
 public class Constants {
 
