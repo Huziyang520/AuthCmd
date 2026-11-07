@@ -38,5 +38,9 @@
   "gui.authcmd.mode_non_op_only": "Белый список команд (без OP)",
   "gui.authcmd.mode_op_only": "Чёрный список команд (OP)",
   "gui.authcmd.mode_both": "Включить оба",
-  "gui.authcmd.show_pause_button": "Включить вход в настройки"
+  "gui.authcmd.show_pause_button": "Включить вход в настройки",
+  "authcmd.configuration.section.authcmd.common.toml": "Common settings",
+  "authcmd.configuration.section.authcmd.common.toml.title": "Common settings",
+  "authcmd.configuration.section.authcmd.client.toml": "Client settings",
+  "authcmd.configuration.section.authcmd.client.toml.title": "Client settings"
 }

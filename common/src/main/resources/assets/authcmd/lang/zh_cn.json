@@ -42,5 +42,8 @@
   "gui.authcmd.mode_op_only": "OP玩家指令黑名单",
   "gui.authcmd.mode_both": "同时启用",
   "gui.authcmd.show_pause_button": "启用配置入口",
-  "gui.authcmd.hint.local_only": "若你没有编辑服务端配置的权限，你编辑的是本机的配置。"
+  "authcmd.configuration.section.authcmd.common.toml": "通用设置",
+  "authcmd.configuration.section.authcmd.common.toml.title": "通用设置",
+  "authcmd.configuration.section.authcmd.client.toml": "客户端设置",
+  "authcmd.configuration.section.authcmd.client.toml.title": "客户端设置"
 }

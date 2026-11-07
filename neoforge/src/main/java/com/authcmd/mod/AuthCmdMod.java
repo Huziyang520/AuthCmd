@@ -7,6 +7,7 @@ import com.authcmd.mod.event.CommandLogic;
 import com.authcmd.mod.event.CommandTreeLogic;
 import com.authcmd.mod.event.GameModeLogic;
 import com.authcmd.mod.event.GuiEventHandler;
+import com.camelot.config.ConfigEnums;
 import com.camelot.net.CamelotNet;
 import com.camelot.neoforge.NeoConfigs;
 import com.mojang.logging.LogUtils;
@@ -30,6 +31,7 @@ public class AuthCmdMod {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public AuthCmdMod(IEventBus modEventBus) {
+        ConfigEnums.register(Constants.MOD_ID, "mode", com.authcmd.mod.config.NeoMode.class);
         NeoConfigs.register(AuthCmdConfig.all());
         CamelotNet.register(AuthCmdConfig.CONFIG, ClientTreeResender::resendAll);
 

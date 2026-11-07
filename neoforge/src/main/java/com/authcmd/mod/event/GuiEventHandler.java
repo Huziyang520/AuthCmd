@@ -1,17 +1,17 @@
 package com.authcmd.mod.event;
 
+import com.authcmd.mod.AvalonLink;
 import com.authcmd.mod.Constants;
 import com.authcmd.mod.config.AuthCmdConfig;
+import com.authcmd.mod.gui.ConfigScreenEntry;
 import com.authcmd.mod.gui.PauseScreenButton;
-import com.camelot.ui.ConfigScreens;
-import com.camelot.ui.Screens;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.common.NeoForge;
 
-/** AuthCmd NeoForge 客户端：暂停界面按钮，打开 NeoForge 自带的配置界面。 */
+/** AuthCmd NeoForge 客户端：暂停界面注入 AvalonBase 界面入口（未装则无按钮）。 */
 public class GuiEventHandler {
 
     private static final Identifier BUTTON_TEXTURE =
@@ -26,6 +26,9 @@ public class GuiEventHandler {
         if (!(event.getScreen() instanceof PauseScreen)) {
             return;
         }
+        if (!AvalonLink.isAvalonLoaded()) {
+            return;
+        }
         if (Minecraft.getInstance().player == null) {
             return;
         }
@@ -38,11 +41,6 @@ public class GuiEventHandler {
         int x = event.getScreen().width - btnSize * 2 - 9;
 
         event.addListener(PauseScreenButton.create(x, 5, btnSize, BUTTON_TEXTURE,
-                () -> {
-                    var screen = ConfigScreens.create(Constants.MOD_ID, null);
-                    if (screen != null) {
-                        Screens.open(screen);
-                    }
-                }));
+                ConfigScreenEntry::openAvalonScreen));
     }
 }

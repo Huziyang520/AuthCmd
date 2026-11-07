@@ -42,5 +42,8 @@
   "gui.authcmd.mode_op_only": "OP command blacklist",
   "gui.authcmd.mode_both": "Enable Both",
   "gui.authcmd.show_pause_button": "Enable config entry",
-  "gui.authcmd.hint.local_only": "Without permission to edit the server config, changes you make here only affect this game."
+  "authcmd.configuration.section.authcmd.common.toml": "Common settings",
+  "authcmd.configuration.section.authcmd.common.toml.title": "Common settings",
+  "authcmd.configuration.section.authcmd.client.toml": "Client settings",
+  "authcmd.configuration.section.authcmd.client.toml.title": "Client settings"
 }

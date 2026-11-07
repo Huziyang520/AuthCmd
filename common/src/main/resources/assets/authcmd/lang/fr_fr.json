@@ -38,5 +38,9 @@
   "gui.authcmd.mode_non_op_only": "Liste blanche des commandes (non-OP)",
   "gui.authcmd.mode_op_only": "Liste noire des commandes (OP)",
   "gui.authcmd.mode_both": "Activer les deux",
-  "gui.authcmd.show_pause_button": "Activer l'accès à la configuration"
+  "gui.authcmd.show_pause_button": "Activer l'accès à la configuration",
+  "authcmd.configuration.section.authcmd.common.toml": "Common settings",
+  "authcmd.configuration.section.authcmd.common.toml.title": "Common settings",
+  "authcmd.configuration.section.authcmd.client.toml": "Client settings",
+  "authcmd.configuration.section.authcmd.client.toml.title": "Client settings"
 }

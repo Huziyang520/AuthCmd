@@ -38,5 +38,9 @@
   "gui.authcmd.mode_non_op_only": "Befehls-Whitelist (Nicht-OP)",
   "gui.authcmd.mode_op_only": "Befehls-Blacklist (OP)",
   "gui.authcmd.mode_both": "Beides aktivieren",
-  "gui.authcmd.show_pause_button": "Konfigurationseintrag aktivieren"
+  "gui.authcmd.show_pause_button": "Konfigurationseintrag aktivieren",
+  "authcmd.configuration.section.authcmd.common.toml": "Common settings",
+  "authcmd.configuration.section.authcmd.common.toml.title": "Common settings",
+  "authcmd.configuration.section.authcmd.client.toml": "Client settings",
+  "authcmd.configuration.section.authcmd.client.toml.title": "Client settings"
 }

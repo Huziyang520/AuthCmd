@@ -38,5 +38,9 @@
   "gui.authcmd.mode_non_op_only": "비OP: 명령 허용 목록",
   "gui.authcmd.mode_op_only": "OP: 명령 차단 목록",
   "gui.authcmd.mode_both": "둘 다 활성화",
-  "gui.authcmd.show_pause_button": "설정 진입점 사용"
+  "gui.authcmd.show_pause_button": "설정 진입점 사용",
+  "authcmd.configuration.section.authcmd.common.toml": "Common settings",
+  "authcmd.configuration.section.authcmd.common.toml.title": "Common settings",
+  "authcmd.configuration.section.authcmd.client.toml": "Client settings",
+  "authcmd.configuration.section.authcmd.client.toml.title": "Client settings"
 }

@@ -38,5 +38,9 @@
   "gui.authcmd.mode_non_op_only": "非OP：コマンドの許可リスト",
   "gui.authcmd.mode_op_only": "OP：コマンドの禁止リスト",
   "gui.authcmd.mode_both": "両方を有効化",
-  "gui.authcmd.show_pause_button": "設定入口を有効化"
+  "gui.authcmd.show_pause_button": "設定入口を有効化",
+  "authcmd.configuration.section.authcmd.common.toml": "Common settings",
+  "authcmd.configuration.section.authcmd.common.toml.title": "Common settings",
+  "authcmd.configuration.section.authcmd.client.toml": "Client settings",
+  "authcmd.configuration.section.authcmd.client.toml.title": "Client settings"
 }
