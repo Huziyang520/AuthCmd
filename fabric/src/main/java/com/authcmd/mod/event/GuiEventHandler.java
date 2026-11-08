@@ -9,12 +9,12 @@ import com.authcmd.mod.mixin.ScreenAccessor;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.PauseScreen;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public class GuiEventHandler {
 
-    private static final Identifier BUTTON_TEXTURE =
-            Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/button.png");
+    private static final ResourceLocation BUTTON_TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/button.png");
 
     public static void register() {
         ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {

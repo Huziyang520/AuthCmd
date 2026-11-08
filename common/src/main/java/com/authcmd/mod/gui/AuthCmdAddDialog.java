@@ -10,15 +10,12 @@ import com.avalon.base.gui.theme.ThemedButton;
 import com.authcmd.mod.config.AuthCmdConfig;
 import com.authcmd.mod.util.ModMsg;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
-import com.mojang.blaze3d.platform.cursor.CursorTypes;
 
 import java.util.List;
 
@@ -103,7 +100,7 @@ public class AuthCmdAddDialog extends Screen {
 
     private void playerMessage(String key) {
         if (minecraft != null && minecraft.player != null)
-            minecraft.player.sendSystemMessage(ModMsg.red(minecraft.player, key));
+            minecraft.player.displayClientMessage(ModMsg.red(minecraft.player, key), false);
     }
 
     private void playClick() {
@@ -112,13 +109,13 @@ public class AuthCmdAddDialog extends Screen {
     }
 
     @Override
-    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+    public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
 
-        super.extractBackground(g, mouseX, mouseY, partialTick);
+        super.renderBackground(g, mouseX, mouseY, partialTick);
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
 
         mouseX = (int) anim.localX(mouseX, width);
         mouseY = (int) anim.localY(mouseY, height);
@@ -126,47 +123,35 @@ public class AuthCmdAddDialog extends Screen {
         int x = (width - DIALOG_W) / 2;
         int y = (height - DIALOG_H) / 2;
         theme.drawPanel(g, x, y, DIALOG_W, DIALOG_H);
-        g.text(font, Component.translatable(command
+        g.drawString(font, Component.translatable(command
                         ? "gui.authcmd.add_command_title" : "gui.authcmd.add_exempt_title"),
                 x + 14, y + 12, theme.labelColor(), false);
-        super.extractRenderState(g, mouseX, mouseY, partialTick);
+        super.render(g, mouseX, mouseY, partialTick);
 
         if (theme instanceof ModernTheme modern) {
             ButtonFrames.render(g, this, modern.palette());
         }
 
-        boolean showHand = false;
-        if (addButton.isHovered() && addButton.active) showHand = true;
-        if (!showHand && doneButton.isHovered()) showHand = true;
-        if (!showHand && input.isMouseOver(mouseX, mouseY)) showHand = true;
-        setCursor(g, showHand);
-
         anim.endFrame(g, width, height);
         if (anim.isCloseFinished()) backToParent();
     }
 
-    private void setCursor(GuiGraphicsExtractor g, boolean showHand) {
-        if (showHand) g.requestCursor(CursorTypes.POINTING_HAND);
-    }
-
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean param) {
-        double mouseX = event.x();
-        double mouseY = event.y();
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
 
         if (input.isMouseOver(mouseX, mouseY)) {
             focusInput();
         }
-        return super.mouseClicked(event, param);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
-    public boolean keyPressed(KeyEvent event) {
-        if (event.isConfirmation()) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 257 || keyCode == 335) {
             addEntry();
             return true;
         }
-        return super.keyPressed(event);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     private void backToParent() {

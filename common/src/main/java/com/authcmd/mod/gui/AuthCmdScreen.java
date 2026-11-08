@@ -16,9 +16,8 @@ import com.avalon.base.gui.theme.ThemedButton;
 import com.avalon.base.gui.theme.ThemedRadio;
 import com.avalon.base.gui.theme.ThemedToggle;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
@@ -146,7 +145,7 @@ public class AuthCmdScreen extends AvalonConfigScreen {
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
 
         mouseX = (int) animation().localX(mouseX, width);
         mouseY = (int) animation().localY(mouseY, height);
@@ -158,13 +157,13 @@ public class AuthCmdScreen extends AvalonConfigScreen {
 
         int cardLeftX = LIST_LEFT_X, cardLeftW = LIST_CARD_W;
         theme.drawCard(graphics, guiLeft + cardLeftX, yo(14), cardLeftW, 70);
-        graphics.text(font, Component.translatable("gui.authcmd.mode_label"),
+        graphics.drawString(font, Component.translatable("gui.authcmd.mode_label"),
                 guiLeft + cardLeftX + 6, yo(18), theme.labelColor(), false);
         for (ThemedRadio r : modeRadios) r.render(graphics, font, theme, yo(r.relY), mouseX, mouseY);
 
         int cardRightX = LIST_RIGHT_X, cardRightW = LIST_CARD_W;
         theme.drawCard(graphics, guiLeft + cardRightX, yo(14), cardRightW, 70);
-        graphics.text(font, Component.translatable("gui.authcmd.toggle_label"),
+        graphics.drawString(font, Component.translatable("gui.authcmd.toggle_label"),
                 guiLeft + cardRightX + 6, yo(18), theme.labelColor(), false);
         showPauseToggle.render(graphics, font, theme, yo(showPauseToggle.relY), mouseX, mouseY);
         enableAnimationsToggle.render(graphics, font, theme, yo(enableAnimationsToggle.relY), mouseX, mouseY);
@@ -187,7 +186,7 @@ public class AuthCmdScreen extends AvalonConfigScreen {
 
         renderStatus(graphics, 200);
 
-        super.extractRenderState(graphics, mouseX, mouseY, partialTick);
+        super.render(graphics, mouseX, mouseY, partialTick);
 
         if (theme instanceof ModernTheme modern) {
             ButtonFrames.render(graphics, this, modern.palette());
@@ -216,7 +215,7 @@ public class AuthCmdScreen extends AvalonConfigScreen {
             }
             if (!showHand && (hoveredCommandRow >= 0 || hoveredExemptRow >= 0)) showHand = true;
         }
-        updateCursor(graphics, showHand);
+        updateCursor(showHand);
 
         String tip = null;
         for (ThemedRadio r : modeRadios) {
@@ -243,11 +242,11 @@ public class AuthCmdScreen extends AvalonConfigScreen {
         endAnimatedRender(graphics);
     }
 
-    private void renderList(GuiGraphicsExtractor graphics, int mouseX, int mouseY, Component label,
+    private void renderList(GuiGraphics graphics, int mouseX, int mouseY, Component label,
                             List<String> list, int cardX, int cardY, boolean isCommand) {
         int cx = guiLeft + cardX;
         theme.drawCard(graphics, cx, yo(cardY), LIST_CARD_W, LIST_CARD_H);
-        graphics.text(font, label, cx + 8, yo(cardY + 4), theme.labelColor(), false);
+        graphics.drawString(font, label, cx + 8, yo(cardY + 4), theme.labelColor(), false);
 
         int listStartY = cardY + 22;
         int scroll = isCommand ? blAnim.displayValue() : exemptAnim.displayValue();
@@ -266,9 +265,9 @@ public class AuthCmdScreen extends AvalonConfigScreen {
                 graphics.fill(cx + 4, y - 2, cx + LIST_CARD_W - 6, y + LIST_ITEM_H - 2, 0x2AB47AE8);
 
                 rowRemoveHint = Component.translatable("gui.authcmd.click_to_remove").getString();
-                }
+            }
             String text = TextFit.fit(font, list.get(idx), rowTextW);
-            graphics.text(font, text, cx + 8, y, canEdit ? theme.textColor() : theme.disabledColor(), false);
+            graphics.drawString(font, text, cx + 8, y, canEdit ? theme.textColor() : theme.disabledColor(), false);
         }
 
         if (list.size() > LIST_VISIBLE_ROWS) {
@@ -284,10 +283,8 @@ public class AuthCmdScreen extends AvalonConfigScreen {
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean param) {
-        double mouseX = event.x();
-        double mouseY = event.y();
-        if (MouseButtons.isLeft(event) && canEdit) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (MouseButtons.isLeft(button) && canEdit) {
 
             for (int i = 0; i < 4; i++) {
                 if (modeRadios[i].isClicked(mouseX, mouseY, font, yo(modeRadios[i].relY))) {
@@ -350,7 +347,7 @@ public class AuthCmdScreen extends AvalonConfigScreen {
                 }
             }
         }
-        return super.mouseClicked(event, param);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
