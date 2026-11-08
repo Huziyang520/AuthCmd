@@ -11,6 +11,12 @@ logoFile = "assets/authcmd/textures/authcmd.png"
 authors = "${mod_author}"
 description = '''${description}'''
 [[dependencies.${mod_id}]]
+modId = "camelot"
+mandatory = true
+versionRange = "[1.0.0,)"
+ordering = "BEFORE"
+side = "BOTH"
+[[dependencies.${mod_id}]]
 modId = "forge"
 mandatory = true
 versionRange = "${forge_loader_version_range}"
