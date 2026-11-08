@@ -8,7 +8,6 @@ import com.avalon.base.gui.anim.ScreenAnimType;
 import com.avalon.base.gui.anim.ScrollAnim;
 import com.avalon.base.gui.panel.PanelHover;
 import com.avalon.base.gui.screen.AvalonConfigScreen;
-import com.avalon.base.gui.util.MouseButtons;
 import com.avalon.base.gui.util.TextFit;
 import com.avalon.base.gui.theme.GuiTheme;
 import com.avalon.base.gui.theme.ModernTheme;
@@ -215,7 +214,7 @@ public class AuthCmdScreen extends AvalonConfigScreen {
             }
             if (!showHand && (hoveredCommandRow >= 0 || hoveredExemptRow >= 0)) showHand = true;
         }
-        updateCursor(showHand);
+        CursorSync.apply(this, graphics, showHand);
 
         String tip = null;
         for (ThemedRadio r : modeRadios) {
@@ -284,7 +283,7 @@ public class AuthCmdScreen extends AvalonConfigScreen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (MouseButtons.isLeft(button) && canEdit) {
+        if (button == 0 && canEdit) {
 
             for (int i = 0; i < 4; i++) {
                 if (modeRadios[i].isClicked(mouseX, mouseY, font, yo(modeRadios[i].relY))) {
