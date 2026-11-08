@@ -1,14 +1,12 @@
 {
     "required": true,
     "package": "com.authcmd.mod.mixin",
-    "compatibilityLevel": "JAVA_21",
-    "mixins": [
-        "ServerGamePacketListenerImplMixin"
-    ],
+    "compatibilityLevel": "JAVA_17",
+    "mixins": [],
     "client": [
+        "ClientSuggestionProviderMixin",
         "GameModeSwitcherScreenMixin",
-        "KeyboardHandlerMixin",
-        "ClientSuggestionProviderMixin"
+        "KeyboardHandlerMixin"
     ],
     "injectors": {
         "defaultRequire": 1

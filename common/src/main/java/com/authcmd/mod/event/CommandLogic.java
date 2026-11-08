@@ -5,10 +5,7 @@ import com.authcmd.mod.util.ModMsg;
 import com.mojang.brigadier.ParseResults;
 import com.mojang.logging.LogUtils;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.permissions.PermissionSet;
-import net.minecraft.server.permissions.Permissions;
 import org.slf4j.Logger;
 
 public class CommandLogic {
@@ -40,7 +37,7 @@ public class CommandLogic {
     private static boolean handle(CommandSourceStack source, String raw, String cmd) {
         if (!(source.getEntity() instanceof ServerPlayer player)) return false;
 
-        boolean isOp = source.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER);
+        boolean isOp = source.hasPermission(2);
         int domain = AuthCmdConfig.resolveDomain(isOp);
         if (domain == 0) return false;
 
@@ -83,7 +80,7 @@ public class CommandLogic {
         while (cmd.startsWith("/")) cmd = cmd.substring(1);
         if (cmd.isEmpty()) return;
 
-        var elevated = player.createCommandSourceStack().withPermission(PermissionSet.ALL_PERMISSIONS);
+        var elevated = player.createCommandSourceStack().withPermission(4);
         player.level().getServer().getCommands().performPrefixedCommand(elevated, cmd);
     }
 }

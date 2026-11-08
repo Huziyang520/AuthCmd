@@ -1,19 +1,17 @@
+modLoader = "javafml"
+loaderVersion = "${neoforge_loader_version_range}"
 license = "${license}"
 [[mods]]
 modId = "${mod_id}"
 version = "${version}"
 displayName = "${mod_name}"
-
 displayURL = "https://www.curseforge.com/minecraft/mc-mods/authcmd"
 issueTrackerURL = "https://github.com/Huziyang520/AuthCmd/issues"
-iconFile = "assets/authcmd/textures/authcmd.png"
+logoFile = "assets/authcmd/textures/authcmd.png"
 authors = "${mod_author}"
-description = '''
-[EN] Restrict which commands players can execute and which game modes they can switch to, based on configurable permission lists.
-[CN] 基于可配置的权限名单，限制玩家可执行的指令，以及可切换的游戏模式。
-'''
+description = '''${description}'''
 [[mixins]]
-config = "authcmd.mixins.json"
+config = "${mod_id}.mixins.json"
 [[dependencies.${mod_id}]]
 modId = "neoforge"
 type = "required"
@@ -27,7 +25,6 @@ versionRange = "${minecraft_version_range}"
 ordering = "NONE"
 side = "BOTH"
 [[dependencies.${mod_id}]]
-
 modId = "avalonbase"
 type = "optional"
 versionRange = "[1.0.0,)"

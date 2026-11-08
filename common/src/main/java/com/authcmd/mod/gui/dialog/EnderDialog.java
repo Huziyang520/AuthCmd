@@ -1,7 +1,5 @@
 package com.authcmd.mod.gui.dialog;
 
-import com.camelot.ui.Screens;
-
 import com.authcmd.mod.config.AuthCmdConfig;
 import com.authcmd.mod.gui.ButtonFrames;
 import com.avalon.base.gui.anim.ScreenAnim;
@@ -10,8 +8,10 @@ import com.avalon.base.gui.theme.GuiTheme;
 import com.avalon.base.gui.theme.ModernTheme;
 import com.avalon.base.gui.theme.ThemedButton;
 import com.avalon.base.gui.util.TextFit;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import com.camelot.ui.Screens;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -80,7 +80,7 @@ abstract class EnderDialog extends Screen {
         return btn;
     }
 
-    protected void renderDialogContents(GuiGraphicsExtractor g, int mouseX, int mouseY) {
+    protected void renderDialogContents(GuiGraphics g, int mouseX, int mouseY) {
     }
 
     protected void backToParent() {
@@ -92,31 +92,40 @@ abstract class EnderDialog extends Screen {
     }
 
     @Override
-    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
-        super.extractBackground(g, mouseX, mouseY, delta);
+    public void renderBackground(GuiGraphics g) {
+        anim.tick();
+        if (anim.isClosing() && anim.isCloseFinished()) {
+            backToParent();
+            return;
+        }
+        super.renderBackground(g);
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics g, int mouseX, int mouseY, float delta) {
+        renderBackground(g);
 
         mouseX = (int) anim.localX(mouseX, width);
         mouseY = (int) anim.localY(mouseY, height);
         anim.beginFrame(g, width, height);
         theme.drawPanel(g, left, top, panelW, panelH);
-        g.centeredText(font, getTitle(), left + panelW / 2, top + TITLE_Y, theme.titleColor());
+        g.drawCenteredString(font, getTitle(), left + panelW / 2, top + TITLE_Y, theme.titleColor());
         int y = top + TEXT_Y;
         for (String line : lines) {
-            g.text(font, line, left + SIDE, y, theme.textColor(), false);
+            g.drawString(font, line, left + SIDE, y, theme.textColor(), false);
             y += LINE_H;
         }
         renderDialogContents(g, mouseX, mouseY);
-        super.extractRenderState(g, mouseX, mouseY, delta);
+        for (var child : children()) {
+            if (child instanceof Renderable childRenderable) {
+                childRenderable.render(g, mouseX, mouseY, delta);
+            }
+        }
 
         if (theme instanceof ModernTheme modern) {
             ButtonFrames.render(g, this, modern.palette());
         }
         anim.endFrame(g, width, height);
-        if (anim.isCloseFinished()) backToParent();
     }
 
     @Override

@@ -1,0 +1,69 @@
+plugins {
+    id 'multiloader-loader'
+    id 'net.minecraftforge.gradle'
+    id 'org.spongepowered.mixin' version '0.7.+'
+}
+
+mixin {
+    add sourceSets.main, "${mod_id}.refmap.json"
+    config "${mod_id}.mixins.json"
+}
+
+minecraft {
+    mappings channel: 'official', version: "${minecraft_version}"
+
+    runs {
+        client {
+            workingDirectory project.file('runs/client')
+            mods {
+                "${mod_id}" {
+                    source sourceSets.main
+                }
+            }
+        }
+        server {
+            workingDirectory project.file('runs/server')
+            args '--nogui'
+            mods {
+                "${mod_id}" {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+repositories {
+    maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+}
+
+configurations {
+    camelotEmbed
+}
+
+dependencies {
+    camelotEmbed("com.camelot:camelot-forge-${mc_range_label}:${camelot_version}") {
+        transitive = false
+    }
+
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    compileOnly project(':common')
+    compileOnly files(rootProject.file(avalonbase_jar))
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+
+    implementation("com.camelot:camelot-forge-${mc_range_label}:${camelot_version}") {
+        transitive = false
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    sourceCompatibility = targetCompatibility = '17'
+}
+
+jar {
+    from({ zipTree(configurations.camelotEmbed.singleFile) }) {
+        exclude 'META-INF/**'
+    }
+    finalizedBy('reobfJar')
+}

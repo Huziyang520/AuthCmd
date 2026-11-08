@@ -3,7 +3,7 @@
     "id": "authcmd",
     "version": "${version}",
     "name": "${mod_name}",
-    "description": "[EN] Restrict which commands players can execute and which game modes they can switch to, based on configurable permission lists.\n[CN] 基于可配置的权限名单，限制玩家可执行的指令，以及可切换的游戏模式。",
+    "description": "${description}",
     "authors": [
         "${mod_author}"
     ],
@@ -31,8 +31,8 @@
     "depends": {
         "fabricloader": ">=0.14",
         "fabric-api": "*",
-        "minecraft": ">=26.3",
-        "java": ">=25"
+        "minecraft": "${fabric_mc_range}",
+        "java": ">=${java_version}"
     },
     "suggests": {
         "avalonbase": ">=1.0.0"
@@ -43,6 +43,11 @@
     "custom": {
         "catalogue": {
             "configFactory": "com.authcmd.mod.client.CatalogueConfigEntry"
+        },
+        "modmenu": {
+            "links": {
+                "authcmd.feedback": "https://issue.mengcai.online/"
+            }
         }
     }
 }

@@ -4,7 +4,6 @@ import com.authcmd.mod.config.AuthCmdConfig;
 import com.authcmd.mod.util.ModMsg;
 import com.mojang.logging.LogUtils;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
 import org.slf4j.Logger;
@@ -14,7 +13,7 @@ public class GameModeLogic {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public static boolean shouldBlock(ServerPlayer player, GameType oldGameMode) {
-        boolean isOp = player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER);
+        boolean isOp = player.hasPermissions(2);
         int domain = AuthCmdConfig.resolveDomain(isOp);
         LOGGER.info("[AuthCmd] shouldBlock player={} isOp={} domain={} oldMode={} whitelist={}",
                 player.getName().getString(), isOp, domain, oldGameMode, AuthCmdConfig.nonOpWhitelist());
@@ -33,7 +32,7 @@ public class GameModeLogic {
 
     public static boolean shouldAllowGameModeChange(Player player) {
         if (player == null) return false;
-        if (player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)) return false;
+        if (player.hasPermissions(2)) return false;
         int domain = AuthCmdConfig.resolveDomain(false);
         if (domain != 1) return false;
         String name = player.getName().getString();
@@ -47,6 +46,6 @@ public class GameModeLogic {
 
     public static boolean allowHasPermissions(Player player, int permissionLevel) {
         if (shouldAllowGameModeSwitcher(player)) return true;
-        return player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER);
+        return player.hasPermissions(permissionLevel);
     }
 }
