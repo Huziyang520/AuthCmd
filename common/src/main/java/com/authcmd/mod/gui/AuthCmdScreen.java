@@ -191,31 +191,6 @@ public class AuthCmdScreen extends AvalonConfigScreen {
             ButtonFrames.render(graphics, this, modern.palette());
         }
 
-        boolean showHand = false;
-        if (canEdit) {
-            for (var w : children()) {
-                if (w instanceof ThemedButton btn && btn.active && btn.isHoveredOrFocused()) {
-                    showHand = true;
-                    break;
-                }
-            }
-            if (!showHand) {
-                for (int i = 0; i < 4; i++) {
-                    if (modeRadios[i].isClicked(mouseX, mouseY, font, yo(modeRadios[i].relY))) {
-                        showHand = true;
-                        break;
-                    }
-                }
-            }
-            if (!showHand && (showPauseToggle.isClicked(mouseX, mouseY, font, yo(showPauseToggle.relY))
-                    || enableAnimationsToggle.isClicked(mouseX, mouseY, font, yo(enableAnimationsToggle.relY))
-                    || allowSelectorsToggle.isClicked(mouseX, mouseY, font, yo(allowSelectorsToggle.relY)))) {
-                showHand = true;
-            }
-            if (!showHand && (hoveredCommandRow >= 0 || hoveredExemptRow >= 0)) showHand = true;
-        }
-        updateCursor(showHand);
-
         String tip = null;
         for (ThemedRadio r : modeRadios) {
             tip = r.truncatedTooltip(font, mouseX, mouseY, yo(r.relY));

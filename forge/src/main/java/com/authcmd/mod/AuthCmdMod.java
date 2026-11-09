@@ -1,6 +1,5 @@
 package com.authcmd.mod;
 
-import com.authcmd.mod.client.ForgeConfigScreens;
 import com.authcmd.mod.config.AuthCmdConfig;
 import com.authcmd.mod.event.ClientTreeResender;
 import com.authcmd.mod.event.CommandLogic;
@@ -36,7 +35,6 @@ public class AuthCmdMod {
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
             GuiEventHandler.register();
-            ForgeConfigScreens.register();
         }
 
         LOGGER.info("AuthCmd loaded!");

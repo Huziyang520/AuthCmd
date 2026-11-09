@@ -1,6 +1,5 @@
 package com.authcmd.mod.gui;
 
-import com.avalon.base.gui.GuiCursor;
 import com.avalon.base.gui.anim.ScreenAnim;
 import com.avalon.base.gui.anim.ScreenAnimType;
 import com.avalon.base.gui.theme.GuiTheme;
@@ -141,12 +140,6 @@ public class AuthCmdAddDialog extends Screen {
         if (theme instanceof ModernTheme modern) {
             ButtonFrames.render(g, this, modern.palette());
         }
-
-        boolean showHand = false;
-        if (addButton.isHovered() && addButton.active) showHand = true;
-        if (!showHand && doneButton.isHovered()) showHand = true;
-        if (!showHand && input.isMouseOver(mouseX, mouseY)) showHand = true;
-        GuiCursor.apply(showHand);
 
         anim.endFrame(g, width, height);
         if (anim.isCloseFinished()) backToParent();
