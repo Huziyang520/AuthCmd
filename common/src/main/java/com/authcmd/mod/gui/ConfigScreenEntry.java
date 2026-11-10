@@ -18,14 +18,23 @@ public final class ConfigScreenEntry {
     private ConfigScreenEntry() {
     }
 
+    static {
+        ConfigScreens.registerGate(Constants.MOD_ID, parent -> {
+            Minecraft mc = Minecraft.getInstance();
+            if (mc.player != null && !AuthCmdConfig.enableConfigEntry()) {
+                return ConfigScreens.entryClosed(parent,
+                        Component.translatable("gui.authcmd.title"),
+                        Component.translatable("gui.authcmd.entry_closed"),
+                        Component.translatable("gui.done"));
+            }
+            return null;
+        });
+    }
+
+    /**
+     * Mod-list entry. The gate above closes it in-game when the entry is disabled.
+     */
     public static Screen create(Screen parent) {
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.player != null && !AuthCmdConfig.enableConfigEntry()) {
-            return ConfigScreens.entryClosed(parent,
-                    Component.translatable("gui.authcmd.title"),
-                    Component.translatable("gui.authcmd.entry_closed"),
-                    Component.translatable("gui.done"));
-        }
         return ConfigScreens.create(Constants.MOD_ID, parent);
     }
 
